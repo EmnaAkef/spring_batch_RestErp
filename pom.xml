@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>com.emna</groupId>
-    <artifactId>spring_batch_test</artifactId>
+    <artifactId>spring_batch_RestErp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spring_batch_test</name>
     <description>Spring Batch test project</description>
