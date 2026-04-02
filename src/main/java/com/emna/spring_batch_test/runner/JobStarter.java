@@ -1,7 +1,5 @@
 package com.emna.spring_batch_test.runner;
 
-import com.emna.spring_batch_test.customer.service.CustomerLoadService;
-import com.emna.spring_batch_test.employee.service.EmployeeLoadService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -13,29 +11,28 @@ import org.springframework.stereotype.Component;
 public class JobStarter implements CommandLineRunner {
 
     private final JobLauncher jobLauncher;
-    private final Job loadDimTenantJob;
-    private final EmployeeLoadService employeeLoadService;
-    private final CustomerLoadService customerLoadService;
+    private final Job loadDimCompanyJob;
+//    private final EmployeeLoadService employeeLoadService;
+//    private final CustomerLoadService customerLoadService;
 
     public JobStarter(
             JobLauncher jobLauncher,
-            @Qualifier("loadDimTenantJob") Job loadDimTenantJob,
-            EmployeeLoadService employeeLoadService, CustomerLoadService customerLoadService) {
+            @Qualifier("loadDimCompanyJob") Job loadDimCompanyJob) {
         this.jobLauncher = jobLauncher;
-        this.loadDimTenantJob = loadDimTenantJob;
-        this.employeeLoadService = employeeLoadService;
-        this.customerLoadService = customerLoadService;
+        this.loadDimCompanyJob = loadDimCompanyJob;
+//        this.employeeLoadService = employeeLoadService;
+//        this.customerLoadService = customerLoadService;
     }
 
     @Override
     public void run(String... args) throws Exception {
         jobLauncher.run(
-                loadDimTenantJob,
+                loadDimCompanyJob,
                 new JobParametersBuilder()
                         .addLong("time", System.currentTimeMillis())
                         .toJobParameters()
         );
-        employeeLoadService.loadAllEmployees();
-        customerLoadService.loadAllCustomers();
+//        employeeLoadService.loadAllEmployees();
+//        customerLoadService.loadAllCustomers();
     }
 }

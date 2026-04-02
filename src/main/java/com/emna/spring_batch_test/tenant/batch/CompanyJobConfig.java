@@ -8,15 +8,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class TenantJobConfig {
+public class CompanyJobConfig {
 
     @Bean
-    public Job loadDimTenantJob(
+    public Job loadDimCompanyJob(
             JobRepository jobRepository,
-            Step loadDimTenantStep) {
+            Step loadDimCompanyStep) {
 
-        return new JobBuilder("loadDimTenantJob", jobRepository)
-                .start(loadDimTenantStep)
+        return new JobBuilder("loadDimCompanyJob", jobRepository)
+                .start(loadDimCompanyStep)
                 .build();
     }
 }

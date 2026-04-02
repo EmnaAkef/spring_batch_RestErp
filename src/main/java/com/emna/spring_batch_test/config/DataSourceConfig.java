@@ -12,16 +12,6 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class DataSourceConfig {
 
-    @Bean
-    @ConfigurationProperties("app.datasource.superadmin")
-    public DataSourceProperties superAdminDataSourceProperties() {
-        return new DataSourceProperties();
-    }
-
-    @Bean(name = "superAdminDataSource")
-    public DataSource superAdminDataSource() {
-        return superAdminDataSourceProperties().initializeDataSourceBuilder().build();
-    }
 
     @Bean
     @ConfigurationProperties("app.datasource.erp")

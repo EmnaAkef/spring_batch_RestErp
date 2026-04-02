@@ -1,4 +1,4 @@
-package com.emna.spring_batch_test.employee.dto;
+package com.emna.spring_batch_test.commun.dto.dim;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
