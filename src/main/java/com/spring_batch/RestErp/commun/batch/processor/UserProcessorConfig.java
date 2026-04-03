@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import java.time.LocalDateTime;
 
 @Configuration
-public class UserProcessorConfig {
+public class   UserProcessorConfig {
 
     @Bean
     public ItemProcessor<UserSource, DimUser> userProcessor() {

@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.Set;
 
 @Configuration
-public class DepartmentProcessorConfig {
+public class  DepartmentProcessorConfig {
 
     @Bean
     public ItemProcessor<DepartmentSource, DimDepartment> departmentProcessor() {
