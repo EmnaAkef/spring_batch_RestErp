@@ -32,8 +32,6 @@ public class CompanyReaderConfig {
             company.setEmployeeCount(rs.getInt("employeecount"));
             company.setEndSalaryMonthDay(rs.getInt("end_salary_month_day"));
             company.setSchemaName(rs.getString("tenant_schema"));
-
-            // Vérifie bien la logique métier
             company.setActive(!rs.getBoolean("archive"));
 
             return company;
