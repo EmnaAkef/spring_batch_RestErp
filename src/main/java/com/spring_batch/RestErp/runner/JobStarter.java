@@ -16,19 +16,22 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadDimDepartmentJob;
     private final Job loadDimUserJob;
     private final Job loadDimCustomerJob;
+    private final Job loadDimWorkstatusJob;
 
     public JobStarter(
             JobLauncher jobLauncher,
             @Qualifier("loadDimCompanyJob") Job loadDimCompanyJob,
             @Qualifier("loadDimDepartmentJob") Job loadDimDepartmentJob,
             @Qualifier("loadDimUserJob") Job loadDimUserJob,
-            @Qualifier("loadDimCustomerJob") Job loadDimCustomerJob) {
+            @Qualifier("loadDimCustomerJob") Job loadDimCustomerJob,
+            @Qualifier("loadDimWorkstatusJob") Job loadDimWorkstatusJob) {
 
         this.jobLauncher = jobLauncher;
         this.loadDimCompanyJob = loadDimCompanyJob;
         this.loadDimDepartmentJob = loadDimDepartmentJob;
         this.loadDimUserJob = loadDimUserJob;
         this.loadDimCustomerJob = loadDimCustomerJob;
+        this.loadDimWorkstatusJob = loadDimWorkstatusJob;
     }
 
     @Override
@@ -65,6 +68,14 @@ public class JobStarter implements CommandLineRunner {
                 loadDimCustomerJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 3)
+                        .toJobParameters()
+        );
+
+        // 5) Ensuite workstatus
+        jobLauncher.run(
+                loadDimWorkstatusJob,
+                new JobParametersBuilder()
+                        .addLong("time", baseTime + 4)
                         .toJobParameters()
         );
     }

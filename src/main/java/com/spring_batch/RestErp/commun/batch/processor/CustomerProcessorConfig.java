@@ -61,8 +61,6 @@ public class CustomerProcessorConfig {
 
     /**
      * Mapping de clientCategory :
-     * 0 -> INDIVIDUAL
-     * 1 -> ORGANIZATION
      */
     private String mapClientCategory(Integer clientCategory) {
         if (clientCategory == null) {
@@ -70,9 +68,8 @@ public class CustomerProcessorConfig {
         }
 
         return switch (clientCategory) {
-            case 0 -> "INDIVIDUAL";
-            case 1 -> "ORGANIZATION";
-            case 2 -> "uknown";
+            case 0 -> "B2B";
+            case 1 -> "B2C";
             default -> "UNKNOWN";
         };
     }
