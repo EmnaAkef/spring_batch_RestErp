@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TenantRegistryService {
+public class  TenantRegistryService {
 
     private final JdbcTemplate jdbcTemplate;
 
