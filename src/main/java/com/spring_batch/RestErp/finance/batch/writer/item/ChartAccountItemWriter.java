@@ -1,6 +1,6 @@
-package com.spring_batch.RestErp.finance.batch.writer;
+package com.spring_batch.RestErp.finance.batch.writer.item;
 
-import com.spring_batch.RestErp.finance.dto.dim.DimVendor;
+import com.spring_batch.RestErp.finance.dto.dim.DimChartAccount;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-public class VendorItemWriter implements ItemWriter<DimVendor> {
+public class ChartAccountItemWriter implements ItemWriter<DimChartAccount> {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -20,13 +20,13 @@ public class VendorItemWriter implements ItemWriter<DimVendor> {
      */
     private final Map<Long, Integer> companyKeyCache = new HashMap<>();
 
-    public VendorItemWriter(JdbcTemplate jdbcTemplate) {
+    public ChartAccountItemWriter(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public void write(Chunk<? extends DimVendor> chunk) throws Exception {
-        for (DimVendor item : chunk) {
+    public void write(Chunk<? extends DimChartAccount> chunk) throws Exception {
+        for (DimChartAccount item : chunk) {
 
             Integer companyKey = getCompanyKey(item.getCompanyId());
 
@@ -44,64 +44,70 @@ public class VendorItemWriter implements ItemWriter<DimVendor> {
              * 1) Fermer la ligne courante si un attribut a changé
              */
             jdbcTemplate.update("""
-                UPDATE dim_vendor
+                UPDATE dim_chart_account
                 SET effective_to = ?,
                     is_current = FALSE
                 WHERE company_id = ?
-                  AND vendor_id = ?
+                  AND chart_id = ?
                   AND is_current = TRUE
                   AND (
                       COALESCE(company_key, -1) <> COALESCE(?, -1)
-                      OR COALESCE(vendor_name, '') <> COALESCE(?, '')
-                      OR COALESCE(industry, '') <> COALESCE(?, '')
-                    )
+                      OR COALESCE(account_name, '') <> COALESCE(?, '')
+                      OR COALESCE(transaction_type, '') <> COALESCE(?, '')
+                      OR COALESCE(account_type, '') <> COALESCE(?, '')
+                  )
             """,
                     effectiveFrom,
                     item.getCompanyId(),
-                    item.getVendorId(),
+                    item.getChartId(),
                     item.getCompanyKey(),
-                    item.getVendorName(),
-                    item.getIndustry()
+                    item.getAccountName(),
+                    item.getTransactionType(),
+                    item.getAccountType()
             );
 
             /*
              * 2) Insérer une nouvelle ligne seulement si aucune ligne courante identique n'existe
              */
             jdbcTemplate.update("""
-                INSERT INTO dim_vendor (
-                    vendor_id,
+                INSERT INTO dim_chart_account (
+                    chart_id,
                     company_id,
                     company_key,
-                    vendor_name,
-                    industry,
+                    account_name,
+                    transaction_type,
+                    account_type,
                     effective_from,
                     effective_to,
                     is_current
                 )
-                SELECT ?, ?, ?, ?, ?, ?, NULL, TRUE
+                SELECT ?, ?, ?, ?, ?, ?, ?, NULL, TRUE
                 WHERE NOT EXISTS (
                     SELECT 1
-                    FROM dim_vendor
+                    FROM dim_chart_account
                     WHERE company_id = ?
-                      AND vendor_id = ?
+                      AND chart_id = ?
                       AND is_current = TRUE
                       AND COALESCE(company_key, -1) = COALESCE(?, -1)
-                      AND COALESCE(vendor_name, '') = COALESCE(?, '')
-                      AND COALESCE(industry, '') = COALESCE(?, '')
+                      AND COALESCE(account_name, '') = COALESCE(?, '')
+                      AND COALESCE(transaction_type, '') = COALESCE(?, '')
+                      AND COALESCE(account_type, '') = COALESCE(?, '')
                 )
             """,
-                    item.getVendorId(),
+                    item.getChartId(),
                     item.getCompanyId(),
                     item.getCompanyKey(),
-                    item.getVendorName(),
-                    item.getIndustry(),
+                    item.getAccountName(),
+                    item.getTransactionType(),
+                    item.getAccountType(),
                     effectiveFrom,
 
                     item.getCompanyId(),
-                    item.getVendorId(),
+                    item.getChartId(),
                     item.getCompanyKey(),
-                    item.getVendorName(),
-                    item.getIndustry()
+                    item.getAccountName(),
+                    item.getTransactionType(),
+                    item.getAccountType()
             );
         }
     }

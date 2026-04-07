@@ -1,5 +1,6 @@
-package com.spring_batch.RestErp.finance.batch.reader;
+package com.spring_batch.RestErp.finance.batch.reader.config;
 
+import com.spring_batch.RestErp.finance.batch.reader.item.VendorItemReader;
 import com.spring_batch.RestErp.finance.dto.source.VendorSource;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Qualifier;
