@@ -1,6 +1,7 @@
-package com.spring_batch.RestErp.finance.batch.writer;
+package com.spring_batch.RestErp.finance.batch.writer.config;
 
 
+import com.spring_batch.RestErp.finance.batch.writer.item.VendorItemWriter;
 import com.spring_batch.RestErp.finance.dto.dim.DimVendor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Qualifier;
