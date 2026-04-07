@@ -19,11 +19,9 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadDimWorkstatusJob;
     private final Job loadDimProductJob;
     private final Job loadDimVendorJob;
-<<<<<<< HEAD
     private final Job loadDimJobOfferJob;
-=======
     private final Job loadDimChartAccountJob;
->>>>>>> 14131b199347347b4ee743d29c051c2cb9f9f06c
+    private final Job loadDimWeeklyShiftTemplateJob;
 
     public JobStarter(
             JobLauncher jobLauncher,
@@ -34,11 +32,9 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadDimWorkstatusJob") Job loadDimWorkstatusJob,
             @Qualifier("loadDimProductJob") Job loadDimProductJob,
             @Qualifier("loadDimVendorJob") Job loadDimVendorJob,
-<<<<<<< HEAD
-            @Qualifier("loadDimJobOfferJob") Job loadDimJobOfferJob) {
-=======
-            @Qualifier("loadDimChartAccountJob") Job loadDimChartAccountJob) {
->>>>>>> 14131b199347347b4ee743d29c051c2cb9f9f06c
+            @Qualifier("loadDimJobOfferJob") Job loadDimJobOfferJob,
+            @Qualifier("loadDimChartAccountJob") Job loadDimChartAccountJob,
+            @Qualifier("loadDimWeeklyShiftTemplateJob") Job loadDimWeeklyShiftTemplateJob) {
 
         this.jobLauncher = jobLauncher;
         this.loadDimCompanyJob = loadDimCompanyJob;
@@ -48,11 +44,9 @@ public class JobStarter implements CommandLineRunner {
         this.loadDimWorkstatusJob = loadDimWorkstatusJob;
         this.loadDimProductJob = loadDimProductJob;
         this.loadDimVendorJob = loadDimVendorJob;
-<<<<<<< HEAD
         this.loadDimJobOfferJob = loadDimJobOfferJob;
-=======
         this.loadDimChartAccountJob = loadDimChartAccountJob;
->>>>>>> 14131b199347347b4ee743d29c051c2cb9f9f06c
+        this.loadDimWeeklyShiftTemplateJob = loadDimWeeklyShiftTemplateJob;
     }
 
     @Override
@@ -118,6 +112,13 @@ public class JobStarter implements CommandLineRunner {
 
         jobLauncher.run(
                 loadDimChartAccountJob,
+                new JobParametersBuilder()
+                        .addLong("time", baseTime + 5)
+                        .toJobParameters()
+        );
+
+        jobLauncher.run(
+                loadDimWeeklyShiftTemplateJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 5)
                         .toJobParameters()

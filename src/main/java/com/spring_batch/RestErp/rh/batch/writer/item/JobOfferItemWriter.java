@@ -1,4 +1,4 @@
-package com.spring_batch.RestErp.rh.batch.writer;
+package com.spring_batch.RestErp.rh.batch.writer.item;
 
 import com.spring_batch.RestErp.rh.dto.dim.DimJobOffer;
 import org.springframework.batch.item.Chunk;

@@ -1,5 +1,6 @@
-package com.spring_batch.RestErp.rh.batch.reader;
+package com.spring_batch.RestErp.rh.batch.reader.config;
 
+import com.spring_batch.RestErp.rh.batch.reader.item.JobOfferItemReader;
 import com.spring_batch.RestErp.rh.dto.source.JobOfferSource;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Qualifier;
