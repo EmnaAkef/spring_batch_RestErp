@@ -1,5 +1,7 @@
 package com.spring_batch.RestErp.rh.dto.source;
 
+import java.time.LocalDateTime;
+
 public class DailyShiftTemplateSource {
 
     private Long dailyShiftId;
@@ -7,12 +9,14 @@ public class DailyShiftTemplateSource {
     private String schemaName;
 
     private Long weeklyTemplateId;
+    private Long userId;
 
     private Integer dayOfWeek;
     private Boolean approve;
     private Integer generalCheckinState;
     private Integer generalCheckoutState;
     private Double workingHours;
+    private LocalDateTime timestamp;
 
     public DailyShiftTemplateSource() {
     }
@@ -47,6 +51,14 @@ public class DailyShiftTemplateSource {
 
     public void setWeeklyTemplateId(Long weeklyTemplateId) {
         this.weeklyTemplateId = weeklyTemplateId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Integer getDayOfWeek() {
@@ -87,5 +99,13 @@ public class DailyShiftTemplateSource {
 
     public void setWorkingHours(Double workingHours) {
         this.workingHours = workingHours;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
     }
 }

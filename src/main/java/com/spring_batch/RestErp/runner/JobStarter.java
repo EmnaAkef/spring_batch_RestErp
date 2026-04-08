@@ -22,6 +22,7 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadDimJobOfferJob;
     private final Job loadDimChartAccountJob;
     private final Job loadDimWeeklyShiftTemplateJob;
+    private final Job loadDimDailyShiftTemplateJob;
 
     public JobStarter(
             JobLauncher jobLauncher,
@@ -34,7 +35,8 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadDimVendorJob") Job loadDimVendorJob,
             @Qualifier("loadDimJobOfferJob") Job loadDimJobOfferJob,
             @Qualifier("loadDimChartAccountJob") Job loadDimChartAccountJob,
-            @Qualifier("loadDimWeeklyShiftTemplateJob") Job loadDimWeeklyShiftTemplateJob) {
+            @Qualifier("loadDimWeeklyShiftTemplateJob") Job loadDimWeeklyShiftTemplateJob,
+            @Qualifier("loadDimDailyShiftTemplateJob") Job loadDimDailyShiftTemplateJob) {
 
         this.jobLauncher = jobLauncher;
         this.loadDimCompanyJob = loadDimCompanyJob;
@@ -47,6 +49,7 @@ public class JobStarter implements CommandLineRunner {
         this.loadDimJobOfferJob = loadDimJobOfferJob;
         this.loadDimChartAccountJob = loadDimChartAccountJob;
         this.loadDimWeeklyShiftTemplateJob = loadDimWeeklyShiftTemplateJob;
+        this.loadDimDailyShiftTemplateJob = loadDimDailyShiftTemplateJob;
     }
 
     @Override
@@ -121,6 +124,13 @@ public class JobStarter implements CommandLineRunner {
                 loadDimWeeklyShiftTemplateJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 5)
+                        .toJobParameters()
+        );
+
+        jobLauncher.run(
+                loadDimDailyShiftTemplateJob,
+                new JobParametersBuilder()
+                        .addLong("time", baseTime + 8)
                         .toJobParameters()
         );
     }

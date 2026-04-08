@@ -13,8 +13,8 @@ public class DimDailyShiftTemplate {
 
     private Integer dayOfWeek;
     private Boolean approve;
-    private String generalCheckinState;
-    private String generalCheckoutState;
+    private Integer generalCheckinState;
+    private Integer generalCheckoutState;
     private Double workingHours;
 
     private LocalDateTime effectiveFrom;
@@ -80,19 +80,19 @@ public class DimDailyShiftTemplate {
         this.approve = approve;
     }
 
-    public String getGeneralCheckinState() {
+    public Integer getGeneralCheckinState() {
         return generalCheckinState;
     }
 
-    public void setGeneralCheckinState(String generalCheckinState) {
+    public void setGeneralCheckinState(Integer generalCheckinState) {
         this.generalCheckinState = generalCheckinState;
     }
 
-    public String getGeneralCheckoutState() {
+    public Integer getGeneralCheckoutState() {
         return generalCheckoutState;
     }
 
-    public void setGeneralCheckoutState(String generalCheckoutState) {
+    public void setGeneralCheckoutState(Integer generalCheckoutState) {
         this.generalCheckoutState = generalCheckoutState;
     }
 
@@ -124,7 +124,7 @@ public class DimDailyShiftTemplate {
         return isCurrent;
     }
 
-    public void setIsCurrent(Boolean isCurrent) {
-        this.isCurrent = isCurrent;
+    public void setIsCurrent(Boolean current) {
+        isCurrent = current;
     }
 }
