@@ -22,6 +22,7 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadDimJobOfferJob;
     private final Job loadDimChartAccountJob;
     private final Job loadDimWeeklyShiftTemplateJob;
+    private final Job loadDimDailyShiftTemplateJob;
 
     public JobStarter(
             JobLauncher jobLauncher,
@@ -34,7 +35,8 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadDimVendorJob") Job loadDimVendorJob,
             @Qualifier("loadDimJobOfferJob") Job loadDimJobOfferJob,
             @Qualifier("loadDimChartAccountJob") Job loadDimChartAccountJob,
-            @Qualifier("loadDimWeeklyShiftTemplateJob") Job loadDimWeeklyShiftTemplateJob) {
+            @Qualifier("loadDimWeeklyShiftTemplateJob") Job loadDimWeeklyShiftTemplateJob,
+            @Qualifier("loadDimDailyShiftTemplateJob") Job loadDimDailyShiftTemplateJob) {
 
         this.jobLauncher = jobLauncher;
         this.loadDimCompanyJob = loadDimCompanyJob;
@@ -47,6 +49,7 @@ public class JobStarter implements CommandLineRunner {
         this.loadDimJobOfferJob = loadDimJobOfferJob;
         this.loadDimChartAccountJob = loadDimChartAccountJob;
         this.loadDimWeeklyShiftTemplateJob = loadDimWeeklyShiftTemplateJob;
+        this.loadDimDailyShiftTemplateJob = loadDimDailyShiftTemplateJob;
     }
 
     @Override
@@ -58,7 +61,6 @@ public class JobStarter implements CommandLineRunner {
                 loadDimCompanyJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime)
-                        .addLong("run.id", baseTime + 100)
                         .toJobParameters()
         );
 
@@ -66,7 +68,6 @@ public class JobStarter implements CommandLineRunner {
                 loadDimDepartmentJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 1)
-                        .addLong("run.id", baseTime + 101)
                         .toJobParameters()
         );
 
@@ -74,7 +75,6 @@ public class JobStarter implements CommandLineRunner {
                 loadDimUserJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 2)
-                        .addLong("run.id", baseTime + 102)
                         .toJobParameters()
         );
 
@@ -82,7 +82,6 @@ public class JobStarter implements CommandLineRunner {
                 loadDimCustomerJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 3)
-                        .addLong("run.id", baseTime + 103)
                         .toJobParameters()
         );
 
@@ -90,7 +89,6 @@ public class JobStarter implements CommandLineRunner {
                 loadDimWorkstatusJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 4)
-                        .addLong("run.id", baseTime + 104)
                         .toJobParameters()
         );
 
@@ -98,7 +96,6 @@ public class JobStarter implements CommandLineRunner {
                 loadDimProductJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 5)
-                        .addLong("run.id", baseTime + 105)
                         .toJobParameters()
         );
 
@@ -106,7 +103,6 @@ public class JobStarter implements CommandLineRunner {
                 loadDimVendorJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 6)
-                        .addLong("run.id", baseTime + 106)
                         .toJobParameters()
         );
 
@@ -114,7 +110,6 @@ public class JobStarter implements CommandLineRunner {
                 loadDimJobOfferJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 7)
-                        .addLong("run.id", baseTime + 107)
                         .toJobParameters()
         );
 
@@ -122,7 +117,6 @@ public class JobStarter implements CommandLineRunner {
                 loadDimChartAccountJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 8)
-                        .addLong("run.id", baseTime + 108)
                         .toJobParameters()
         );
 
@@ -130,7 +124,13 @@ public class JobStarter implements CommandLineRunner {
                 loadDimWeeklyShiftTemplateJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 9)
-                        .addLong("run.id", baseTime + 109)
+                        .toJobParameters()
+        );
+
+        jobLauncher.run(
+                loadDimDailyShiftTemplateJob,
+                new JobParametersBuilder()
+                        .addLong("time", baseTime + 10)
                         .toJobParameters()
         );
     }
