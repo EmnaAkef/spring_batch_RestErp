@@ -5,6 +5,7 @@ spring:
     job:
       enabled: false
 
+
 app:
   datasource:
     erp:
