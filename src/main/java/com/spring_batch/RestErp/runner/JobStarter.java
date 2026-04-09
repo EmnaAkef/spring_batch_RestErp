@@ -24,6 +24,9 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadDimWeeklyShiftTemplateJob;
     private final Job loadDimDailyShiftTemplateJob;
 
+
+    private final Job loadFactChartBalanceSnapshotJob;
+
     public JobStarter(
             JobLauncher jobLauncher,
             @Qualifier("loadDimCompanyJob") Job loadDimCompanyJob,
@@ -36,7 +39,11 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadDimJobOfferJob") Job loadDimJobOfferJob,
             @Qualifier("loadDimChartAccountJob") Job loadDimChartAccountJob,
             @Qualifier("loadDimWeeklyShiftTemplateJob") Job loadDimWeeklyShiftTemplateJob,
-            @Qualifier("loadDimDailyShiftTemplateJob") Job loadDimDailyShiftTemplateJob) {
+            @Qualifier("loadDimDailyShiftTemplateJob") Job loadDimDailyShiftTemplateJob,
+
+
+
+            @Qualifier("loadFactChartBalanceSnapshotJob") Job loadFactChartBalanceSnapshotJob) {
 
         this.jobLauncher = jobLauncher;
         this.loadDimCompanyJob = loadDimCompanyJob;
@@ -50,6 +57,9 @@ public class JobStarter implements CommandLineRunner {
         this.loadDimChartAccountJob = loadDimChartAccountJob;
         this.loadDimWeeklyShiftTemplateJob = loadDimWeeklyShiftTemplateJob;
         this.loadDimDailyShiftTemplateJob = loadDimDailyShiftTemplateJob;
+
+
+        this.loadFactChartBalanceSnapshotJob = loadFactChartBalanceSnapshotJob;
     }
 
     @Override
@@ -57,80 +67,89 @@ public class JobStarter implements CommandLineRunner {
 
         long baseTime = System.currentTimeMillis();
 
-        jobLauncher.run(
-                loadDimCompanyJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime)
-                        .toJobParameters()
-        );
+//        jobLauncher.run(
+//                loadDimCompanyJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime)
+//                        .toJobParameters()
+//        );
+//
+//        jobLauncher.run(
+//                loadDimDepartmentJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 1)
+//                        .toJobParameters()
+//        );
+//
+//        jobLauncher.run(
+//                loadDimUserJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 2)
+//                        .toJobParameters()
+//        );
+//
+//        jobLauncher.run(
+//                loadDimCustomerJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 3)
+//                        .toJobParameters()
+//        );
+//
+//        jobLauncher.run(
+//                loadDimWorkstatusJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 4)
+//                        .toJobParameters()
+//        );
+//
+//        jobLauncher.run(
+//                loadDimProductJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 5)
+//                        .toJobParameters()
+//        );
+//
+//        jobLauncher.run(
+//                loadDimVendorJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 6)
+//                        .toJobParameters()
+//        );
+//
+//        jobLauncher.run(
+//                loadDimJobOfferJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 7)
+//                        .toJobParameters()
+//        );
+//
+//        jobLauncher.run(
+//                loadDimChartAccountJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 8)
+//                        .toJobParameters()
+//        );
+//
+//        jobLauncher.run(
+//                loadDimWeeklyShiftTemplateJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 9)
+//                        .toJobParameters()
+//        );
 
-        jobLauncher.run(
-                loadDimDepartmentJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 1)
-                        .toJobParameters()
-        );
+//        jobLauncher.run(
+//                loadDimDailyShiftTemplateJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 10)
+//                        .toJobParameters()
+//        );
 
-        jobLauncher.run(
-                loadDimUserJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 2)
-                        .toJobParameters()
-        );
 
+        //fact tables
         jobLauncher.run(
-                loadDimCustomerJob,
+                loadFactChartBalanceSnapshotJob,
                 new JobParametersBuilder()
-                        .addLong("time", baseTime + 3)
-                        .toJobParameters()
-        );
-
-        jobLauncher.run(
-                loadDimWorkstatusJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 4)
-                        .toJobParameters()
-        );
-
-        jobLauncher.run(
-                loadDimProductJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 5)
-                        .toJobParameters()
-        );
-
-        jobLauncher.run(
-                loadDimVendorJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 6)
-                        .toJobParameters()
-        );
-
-        jobLauncher.run(
-                loadDimJobOfferJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 7)
-                        .toJobParameters()
-        );
-
-        jobLauncher.run(
-                loadDimChartAccountJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 5)
-                        .toJobParameters()
-        );
-
-        jobLauncher.run(
-                loadDimWeeklyShiftTemplateJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 5)
-                        .toJobParameters()
-        );
-
-        jobLauncher.run(
-                loadDimDailyShiftTemplateJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 8)
+                        .addLong("time", baseTime + 11)
                         .toJobParameters()
         );
     }
