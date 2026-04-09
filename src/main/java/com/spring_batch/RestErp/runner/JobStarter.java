@@ -23,6 +23,7 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadDimChartAccountJob;
     private final Job loadDimWeeklyShiftTemplateJob;
     private final Job loadDimDailyShiftTemplateJob;
+    private final Job loadFactSalesLineJob;
 
 
     private final Job loadFactChartBalanceSnapshotJob;
@@ -40,10 +41,14 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadDimChartAccountJob") Job loadDimChartAccountJob,
             @Qualifier("loadDimWeeklyShiftTemplateJob") Job loadDimWeeklyShiftTemplateJob,
             @Qualifier("loadDimDailyShiftTemplateJob") Job loadDimDailyShiftTemplateJob,
+<<<<<<< HEAD
 
 
 
             @Qualifier("loadFactChartBalanceSnapshotJob") Job loadFactChartBalanceSnapshotJob) {
+=======
+            @Qualifier("loadFactSalesLineJob") Job loadFactSalesLineJob) {
+>>>>>>> 6e2755369b8e19712e6c43c7283c49e38230809d
 
         this.jobLauncher = jobLauncher;
         this.loadDimCompanyJob = loadDimCompanyJob;
@@ -57,9 +62,13 @@ public class JobStarter implements CommandLineRunner {
         this.loadDimChartAccountJob = loadDimChartAccountJob;
         this.loadDimWeeklyShiftTemplateJob = loadDimWeeklyShiftTemplateJob;
         this.loadDimDailyShiftTemplateJob = loadDimDailyShiftTemplateJob;
+<<<<<<< HEAD
 
 
         this.loadFactChartBalanceSnapshotJob = loadFactChartBalanceSnapshotJob;
+=======
+        this.loadFactSalesLineJob = loadFactSalesLineJob;
+>>>>>>> 6e2755369b8e19712e6c43c7283c49e38230809d
     }
 
     @Override
@@ -136,6 +145,7 @@ public class JobStarter implements CommandLineRunner {
 //                        .addLong("time", baseTime + 9)
 //                        .toJobParameters()
 //        );
+<<<<<<< HEAD
 
 //        jobLauncher.run(
 //                loadDimDailyShiftTemplateJob,
@@ -148,6 +158,18 @@ public class JobStarter implements CommandLineRunner {
         //fact tables
         jobLauncher.run(
                 loadFactChartBalanceSnapshotJob,
+=======
+//
+//        jobLauncher.run(
+//                loadDimDailyShiftTemplateJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 10)
+//                        .toJobParameters()
+//        );
+
+        jobLauncher.run(
+                loadFactSalesLineJob,
+>>>>>>> 6e2755369b8e19712e6c43c7283c49e38230809d
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 11)
                         .toJobParameters()
