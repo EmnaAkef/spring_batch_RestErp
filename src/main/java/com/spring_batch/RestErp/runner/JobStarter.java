@@ -23,10 +23,10 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadDimChartAccountJob;
     private final Job loadDimWeeklyShiftTemplateJob;
     private final Job loadDimDailyShiftTemplateJob;
+
     private final Job loadFactSalesLineJob;
-
-
     private final Job loadFactChartBalanceSnapshotJob;
+    private final Job loadFactCashMovementJob;
 
     public JobStarter(
             JobLauncher jobLauncher,
@@ -41,14 +41,9 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadDimChartAccountJob") Job loadDimChartAccountJob,
             @Qualifier("loadDimWeeklyShiftTemplateJob") Job loadDimWeeklyShiftTemplateJob,
             @Qualifier("loadDimDailyShiftTemplateJob") Job loadDimDailyShiftTemplateJob,
-<<<<<<< HEAD
-
-
-
-            @Qualifier("loadFactChartBalanceSnapshotJob") Job loadFactChartBalanceSnapshotJob) {
-=======
-            @Qualifier("loadFactSalesLineJob") Job loadFactSalesLineJob) {
->>>>>>> 6e2755369b8e19712e6c43c7283c49e38230809d
+            @Qualifier("loadFactSalesLineJob") Job loadFactSalesLineJob,
+            @Qualifier("loadFactChartBalanceSnapshotJob") Job loadFactChartBalanceSnapshotJob,
+            @Qualifier("loadFactCashMovementJob") Job loadFactCashMovementJob) {
 
         this.jobLauncher = jobLauncher;
         this.loadDimCompanyJob = loadDimCompanyJob;
@@ -62,13 +57,11 @@ public class JobStarter implements CommandLineRunner {
         this.loadDimChartAccountJob = loadDimChartAccountJob;
         this.loadDimWeeklyShiftTemplateJob = loadDimWeeklyShiftTemplateJob;
         this.loadDimDailyShiftTemplateJob = loadDimDailyShiftTemplateJob;
-<<<<<<< HEAD
 
 
-        this.loadFactChartBalanceSnapshotJob = loadFactChartBalanceSnapshotJob;
-=======
         this.loadFactSalesLineJob = loadFactSalesLineJob;
->>>>>>> 6e2755369b8e19712e6c43c7283c49e38230809d
+        this.loadFactChartBalanceSnapshotJob = loadFactChartBalanceSnapshotJob;
+        this.loadFactCashMovementJob = loadFactCashMovementJob;
     }
 
     @Override
@@ -76,6 +69,7 @@ public class JobStarter implements CommandLineRunner {
 
         long baseTime = System.currentTimeMillis();
 
+        // Dimensions
 //        jobLauncher.run(
 //                loadDimCompanyJob,
 //                new JobParametersBuilder()
@@ -145,20 +139,6 @@ public class JobStarter implements CommandLineRunner {
 //                        .addLong("time", baseTime + 9)
 //                        .toJobParameters()
 //        );
-<<<<<<< HEAD
-
-//        jobLauncher.run(
-//                loadDimDailyShiftTemplateJob,
-//                new JobParametersBuilder()
-//                        .addLong("time", baseTime + 10)
-//                        .toJobParameters()
-//        );
-
-
-        //fact tables
-        jobLauncher.run(
-                loadFactChartBalanceSnapshotJob,
-=======
 //
 //        jobLauncher.run(
 //                loadDimDailyShiftTemplateJob,
@@ -167,11 +147,25 @@ public class JobStarter implements CommandLineRunner {
 //                        .toJobParameters()
 //        );
 
+         //Fact tables
+//        jobLauncher.run(
+//                loadFactSalesLineJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 11)
+//                        .toJobParameters()
+//        );
+//
+//        jobLauncher.run(
+//                loadFactChartBalanceSnapshotJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 12)
+//                        .toJobParameters()
+//        );
+
         jobLauncher.run(
-                loadFactSalesLineJob,
->>>>>>> 6e2755369b8e19712e6c43c7283c49e38230809d
+                loadFactCashMovementJob,
                 new JobParametersBuilder()
-                        .addLong("time", baseTime + 11)
+                        .addLong("time", baseTime + 13)
                         .toJobParameters()
         );
     }
