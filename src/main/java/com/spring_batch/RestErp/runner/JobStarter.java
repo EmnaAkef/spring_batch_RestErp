@@ -137,11 +137,11 @@ public class JobStarter implements CommandLineRunner {
 //                        .toJobParameters()
 //        );
 
-        jobLauncher.run(
-                loadFactSalesLineJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 11)
-                        .toJobParameters()
-        );
+//        jobLauncher.run(
+//                loadFactSalesLineJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 11)
+//                        .toJobParameters()
+//        );
     }
 }
