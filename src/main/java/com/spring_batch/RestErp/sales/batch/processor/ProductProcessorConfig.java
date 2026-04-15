@@ -73,9 +73,17 @@ public class ProductProcessorConfig {
         }
 
         return switch (productType) {
-            case 0 -> "TYPE_0";
-            case 1 -> "TYPE_1";
-            default -> "TYPE_2";
+            case 0 -> "CONSUMER_GOODS";
+            case 1 -> "INDUSTRIAL_GOODS";
+            case 2 -> "SERVICES";
+            case 3 -> "LUXURY_GOODS";
+            case 4 -> "CONVENIENCE_GOODS";
+            case 5 -> "SPECIALTY_GOODS";
+            case 6 -> "DIGITAL_PRODUCTS";
+            case 7 -> "SEASONAL_PRODUCTS";
+            case 8 -> "ROW_MATERIAL";
+            case 9 -> "INTERMEDIATE_MATERIAL";
+            default -> "OTHER";
 
         };
     }
@@ -90,10 +98,8 @@ public class ProductProcessorConfig {
         }
 
         return switch (status) {
-            case 0 -> "STATUS_0";
-            case 1 -> "STATUS_1";
-            case 2 -> "STATUS_2";
-            case 3 -> "STATUS_3";
+            case 0 -> "WAITING_PROOF_CONFIRMATION";
+            case 1 -> "IN_WAREHOUSE";
             default -> "UNKNOWN";
         };
     }
