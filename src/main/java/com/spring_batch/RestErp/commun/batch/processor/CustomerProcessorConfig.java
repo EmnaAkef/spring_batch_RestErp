@@ -85,8 +85,12 @@ public class CustomerProcessorConfig {
         }
 
         return switch (type) {
-            case 0 -> "TYPE_0";
-            case 1 -> "TYPE_1";
+            case 0 -> "CLIENT";
+            case 1 -> "COMPANY";
+            case 2 -> "CUSTOMER";
+            case 3 -> " INDIVIDUAL";
+            case 4 -> "INSTITUTION";
+            case 5 -> "GOVERNMENT";
             default -> "UNKNOWN";
         };
     }
