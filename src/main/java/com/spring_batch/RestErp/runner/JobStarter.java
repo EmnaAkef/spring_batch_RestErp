@@ -23,11 +23,16 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadDimChartAccountJob;
     private final Job loadDimWeeklyShiftTemplateJob;
     private final Job loadDimDailyShiftTemplateJob;
+    //fact
     private final Job loadFactSalesLineJob;
     private final Job loadFactChartBalanceSnapshotJob;
     private final Job loadFactCashMovementJob;
     private final Job loadFactSalesFinancialsJob;
+<<<<<<< HEAD
     private final Job loadFactSalesOrderJob;
+=======
+    private final Job loadFactInvoiceJob;
+>>>>>>> 24c99f088a7622840ad68a27751eb8929d222e0a
 
     public JobStarter(
             JobLauncher jobLauncher,
@@ -46,7 +51,12 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadFactChartBalanceSnapshotJob") Job loadFactChartBalanceSnapshotJob,
             @Qualifier("loadFactCashMovementJob") Job loadFactCashMovementJob,
             @Qualifier("loadFactSalesFinancialsJob") Job loadFactSalesFinancialsJob,
+<<<<<<< HEAD
             @Qualifier("loadFactSalesOrderJob") Job loadFactSalesOrderJob) {
+=======
+            @Qualifier("loadFactInvoiceJob") Job loadFactInvoiceJob) {
+
+>>>>>>> 24c99f088a7622840ad68a27751eb8929d222e0a
 
         this.jobLauncher = jobLauncher;
         this.loadDimCompanyJob = loadDimCompanyJob;
@@ -64,7 +74,11 @@ public class JobStarter implements CommandLineRunner {
         this.loadFactChartBalanceSnapshotJob = loadFactChartBalanceSnapshotJob;
         this.loadFactCashMovementJob = loadFactCashMovementJob;
         this.loadFactSalesFinancialsJob = loadFactSalesFinancialsJob;
+<<<<<<< HEAD
         this.loadFactSalesOrderJob = loadFactSalesOrderJob;
+=======
+        this.loadFactInvoiceJob = loadFactInvoiceJob;
+>>>>>>> 24c99f088a7622840ad68a27751eb8929d222e0a
     }
 
     @Override
@@ -169,6 +183,13 @@ public class JobStarter implements CommandLineRunner {
 //                        .addLong("time", baseTime + 11)
 //                        .toJobParameters()
 //        );
+//
+//        jobLauncher.run(
+//                loadFactSalesFinancialsJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 11)
+//                        .toJobParameters()
+//        );
 
 //        jobLauncher.run(
 //                loadFactSalesFinancialsJob,
@@ -178,12 +199,15 @@ public class JobStarter implements CommandLineRunner {
 //        );
 
         jobLauncher.run(
+<<<<<<< HEAD
                 loadFactSalesOrderJob,
+=======
+                loadFactInvoiceJob,
+>>>>>>> 24c99f088a7622840ad68a27751eb8929d222e0a
                 new JobParametersBuilder()
-                        .addLong("time", baseTime + 11)
+                        .addLong("time", baseTime + 14)
                         .toJobParameters()
         );
-
 
     }
 }
