@@ -28,11 +28,9 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadFactChartBalanceSnapshotJob;
     private final Job loadFactCashMovementJob;
     private final Job loadFactSalesFinancialsJob;
-<<<<<<< HEAD
     private final Job loadFactSalesOrderJob;
-=======
     private final Job loadFactInvoiceJob;
->>>>>>> 24c99f088a7622840ad68a27751eb8929d222e0a
+    private final Job loadFactDealJob;
 
     public JobStarter(
             JobLauncher jobLauncher,
@@ -51,12 +49,9 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadFactChartBalanceSnapshotJob") Job loadFactChartBalanceSnapshotJob,
             @Qualifier("loadFactCashMovementJob") Job loadFactCashMovementJob,
             @Qualifier("loadFactSalesFinancialsJob") Job loadFactSalesFinancialsJob,
-<<<<<<< HEAD
-            @Qualifier("loadFactSalesOrderJob") Job loadFactSalesOrderJob) {
-=======
-            @Qualifier("loadFactInvoiceJob") Job loadFactInvoiceJob) {
-
->>>>>>> 24c99f088a7622840ad68a27751eb8929d222e0a
+            @Qualifier("loadFactSalesOrderJob") Job loadFactSalesOrderJob,
+            @Qualifier("loadFactInvoiceJob") Job loadFactInvoiceJob,
+            @Qualifier("loadFactDealJob") Job loadFactDealJob) {
 
         this.jobLauncher = jobLauncher;
         this.loadDimCompanyJob = loadDimCompanyJob;
@@ -74,11 +69,9 @@ public class JobStarter implements CommandLineRunner {
         this.loadFactChartBalanceSnapshotJob = loadFactChartBalanceSnapshotJob;
         this.loadFactCashMovementJob = loadFactCashMovementJob;
         this.loadFactSalesFinancialsJob = loadFactSalesFinancialsJob;
-<<<<<<< HEAD
         this.loadFactSalesOrderJob = loadFactSalesOrderJob;
-=======
         this.loadFactInvoiceJob = loadFactInvoiceJob;
->>>>>>> 24c99f088a7622840ad68a27751eb8929d222e0a
+        this.loadFactDealJob = loadFactDealJob;
     }
 
     @Override
@@ -198,12 +191,22 @@ public class JobStarter implements CommandLineRunner {
 //                        .toJobParameters()
 //        );
 
+//        jobLauncher.run(
+//                loadFactSalesOrderJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 14)
+//                        .toJobParameters()
+//        );
+
+//            jobLauncher.run(
+//            loadFactInvoiceJob,
+//            new JobParametersBuilder()
+//                    .addLong("time", baseTime + 14)
+//                    .toJobParameters()
+//        );
+
         jobLauncher.run(
-<<<<<<< HEAD
-                loadFactSalesOrderJob,
-=======
-                loadFactInvoiceJob,
->>>>>>> 24c99f088a7622840ad68a27751eb8929d222e0a
+                loadFactDealJob,
                 new JobParametersBuilder()
                         .addLong("time", baseTime + 14)
                         .toJobParameters()
