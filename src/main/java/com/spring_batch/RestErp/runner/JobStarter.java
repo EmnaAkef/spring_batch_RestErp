@@ -79,12 +79,12 @@ public class JobStarter implements CommandLineRunner {
 
         long baseTime = System.currentTimeMillis();
 
-//        jobLauncher.run(
-//                loadDimCompanyJob,
-//                new JobParametersBuilder()
-//                        .addLong("time", baseTime)
-//                        .toJobParameters()
-//        );
+        jobLauncher.run(
+                loadDimCompanyJob,
+                new JobParametersBuilder()
+                        .addLong("time", baseTime)
+                        .toJobParameters()
+        );
 
 //        jobLauncher.run(
 //                loadDimDepartmentJob,
@@ -205,12 +205,12 @@ public class JobStarter implements CommandLineRunner {
 //                    .toJobParameters()
 //        );
 
-        jobLauncher.run(
-                loadFactDealJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 14)
-                        .toJobParameters()
-        );
+//        jobLauncher.run(
+//                loadFactDealJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 14)
+//                        .toJobParameters()
+//        );
 
     }
 }

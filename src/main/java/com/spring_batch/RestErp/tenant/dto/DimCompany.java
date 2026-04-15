@@ -10,6 +10,7 @@ public class DimCompany {
     private String schemaName;
     private String city;
     private String country;
+    private String currency;
     private Boolean active;
     private Integer employeeCount;
     private Integer endSalaryMonthDay;
@@ -115,6 +116,16 @@ public class DimCompany {
     public void setIsCurrent(Boolean isCurrent) {
         this.isCurrent = isCurrent;
     }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+
 
     @Override
     public String toString() {

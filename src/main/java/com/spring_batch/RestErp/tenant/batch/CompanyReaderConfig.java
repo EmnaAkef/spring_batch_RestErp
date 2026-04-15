@@ -18,7 +18,7 @@ public class CompanyReaderConfig {
         JdbcCursorItemReader<CompanyRegistry> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(erpDataSource);
         reader.setSql("""
-                select id, companyname, city, country, archive, tenant_schema, employeecount, end_salary_month_day
+                select id, companyname, currency, city, country, archive, tenant_schema, employeecount, end_salary_month_day
                 from public.company
                 order by id
                 """);
@@ -29,6 +29,7 @@ public class CompanyReaderConfig {
             company.setCompanyName(rs.getString("companyname"));
             company.setCity(rs.getString("city"));
             company.setCountry(rs.getString("country"));
+            company.setCurrency(rs.getInt("currency"));
             company.setEmployeeCount(rs.getInt("employeecount"));
             company.setEndSalaryMonthDay(rs.getInt("end_salary_month_day"));
             company.setSchemaName(rs.getString("tenant_schema"));

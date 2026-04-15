@@ -49,7 +49,7 @@ public class SalesFinancialsProcessorConfig {
             target.setAllocatedAmount(source.getAllocatedAmount());
             target.setUnallocatedAmount(source.getUnallocatedAmount());
 
-            target.setPaymentState(cleanText(source.getPaymentState()));
+            target.setPaymentState(cleanText(mapPaymentState(source.getPaymentState())));
             target.setInvoiceStatus(cleanText(mapInvoiceStatus(source.getInvoiceStatus())));
             target.setQuotationState(cleanText(mapQuotationStatus(source.getQuotationState())));
 
@@ -102,6 +102,27 @@ public class SalesFinancialsProcessorConfig {
             case 2 -> "ACCEPTED";
             case 3 -> "REJECTED";
             case 4 -> "EXPIRED";
+            default -> "UNKNOWN";
+        };
+    }
+
+    private String mapPaymentState(String paymentState) {
+        if (paymentState == null) {
+            return null;
+        }
+
+        Integer value;
+        try {
+            value = Integer.parseInt(paymentState);
+        } catch (NumberFormatException e) {
+            return paymentState;
+        }
+
+        return switch (value) {
+            case 0 -> "REFUNDED";
+            case 1 -> "PAID";
+            case 2 -> "UNPAID";
+            case 3 -> "WAITING";
             default -> "UNKNOWN";
         };
     }

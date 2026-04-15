@@ -68,13 +68,9 @@ public class ChartAccountProcessorConfig {
             return null;
         }
 
-        return switch (transactionType) {//not adjusted yet
-            case 0 -> "CLIENT";
-            case 1 -> "COMPANY";
-            case 2 -> "CUSTOMER";
-            case 3 -> " INDIVIDUAL";
-            case 4 -> "INSTITUTION";
-            case 5 -> "GOVERNMENT";
+        return switch (transactionType) {
+            case 0 -> "DEBIT";
+            case 1 -> "CREDIT";
             default -> "UNKNOWN";
         };
     }

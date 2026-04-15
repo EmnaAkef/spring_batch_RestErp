@@ -9,11 +9,12 @@ public class CompanyRegistry {
     private String country;
     private Boolean active;
     private Integer employeeCount;
+    private Integer currency;
     private Integer endSalaryMonthDay;
 
     public CompanyRegistry(Integer endSalaryMonthDay, Integer employeeCount,
-                      Boolean active, String country, String city, String schemaName, String companyName,
-                      Long companyId) {
+                           Boolean active, String country, String city, String schemaName, String companyName,
+                           Long companyId, Integer currency) {
         this.endSalaryMonthDay = endSalaryMonthDay;
         this.employeeCount = employeeCount;
         this.active = active;
@@ -22,10 +23,10 @@ public class CompanyRegistry {
         this.schemaName = schemaName;
         this.companyName = companyName;
         this.companyId = companyId;
+        this.currency = currency;
     }
 
     public CompanyRegistry() {
-
     }
 
     public Long getCompanyId() {
@@ -90,6 +91,14 @@ public class CompanyRegistry {
 
     public void setEndSalaryMonthDay(Integer endSalaryMonthDay) {
         this.endSalaryMonthDay = endSalaryMonthDay;
+    }
+
+    public Integer getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Integer currency) {
+        this.currency = currency;
     }
 
     @Override

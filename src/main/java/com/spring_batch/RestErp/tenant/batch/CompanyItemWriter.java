@@ -33,6 +33,7 @@ public class CompanyItemWriter implements ItemWriter<DimCompany> {
                       OR COALESCE(schema_name, '') <> COALESCE(?, '')
                       OR COALESCE(city, '') <> COALESCE(?, '')
                       OR COALESCE(country, '') <> COALESCE(?, '')
+                    OR COALESCE(currency, '') <> COALESCE(?, '')
                       OR COALESCE(employee_count, -1) <> COALESCE(?, -1)
                       OR COALESCE(end_salary_month_day, -1) <> COALESCE(?, -1)
                       OR COALESCE(active, FALSE) <> COALESCE(?, FALSE)
@@ -44,6 +45,7 @@ public class CompanyItemWriter implements ItemWriter<DimCompany> {
                     item.getSchemaName(),
                     item.getCity(),
                     item.getCountry(),
+                    item.getCurrency(),
                     item.getEmployeeCount(),
                     item.getEndSalaryMonthDay(),
                     item.getActive()
@@ -56,6 +58,7 @@ public class CompanyItemWriter implements ItemWriter<DimCompany> {
                     schema_name,
                     city,
                     country,
+                    currency,
                     employee_count,
                     end_salary_month_day,
                     active,
@@ -63,7 +66,7 @@ public class CompanyItemWriter implements ItemWriter<DimCompany> {
                     effective_to,
                     is_current
                 )
-                SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, TRUE
+                SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, TRUE
                 WHERE NOT EXISTS (
                     SELECT 1
                     FROM dim_company
@@ -73,6 +76,7 @@ public class CompanyItemWriter implements ItemWriter<DimCompany> {
                       AND COALESCE(schema_name, '') = COALESCE(?, '')
                       AND COALESCE(city, '') = COALESCE(?, '')
                       AND COALESCE(country, '') = COALESCE(?, '')
+                      AND COALESCE(currency, '') = COALESCE(?, '')
                       AND COALESCE(employee_count, -1) = COALESCE(?, -1)
                       AND COALESCE(end_salary_month_day, -1) = COALESCE(?, -1)
                       AND COALESCE(active, FALSE) = COALESCE(?, FALSE)
@@ -83,6 +87,7 @@ public class CompanyItemWriter implements ItemWriter<DimCompany> {
                     item.getSchemaName(),
                     item.getCity(),
                     item.getCountry(),
+                    item.getCurrency(),
                     item.getEmployeeCount(),
                     item.getEndSalaryMonthDay(),
                     item.getActive(),
@@ -93,6 +98,7 @@ public class CompanyItemWriter implements ItemWriter<DimCompany> {
                     item.getSchemaName(),
                     item.getCity(),
                     item.getCountry(),
+                    item.getCurrency(),
                     item.getEmployeeCount(),
                     item.getEndSalaryMonthDay(),
                     item.getActive()
