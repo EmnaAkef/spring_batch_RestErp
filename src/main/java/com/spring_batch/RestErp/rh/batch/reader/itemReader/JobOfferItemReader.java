@@ -1,4 +1,4 @@
-package com.spring_batch.RestErp.rh.batch.reader.item;
+package com.spring_batch.RestErp.rh.batch.reader.itemReader;
 
 
 

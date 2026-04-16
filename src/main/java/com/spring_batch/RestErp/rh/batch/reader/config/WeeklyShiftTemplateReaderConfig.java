@@ -1,6 +1,6 @@
 package com.spring_batch.RestErp.rh.batch.reader.config;
 
-import com.spring_batch.RestErp.rh.batch.reader.item.WeeklyShiftTemplateItemReader;
+import com.spring_batch.RestErp.rh.batch.reader.itemReader.WeeklyShiftTemplateItemReader;
 import com.spring_batch.RestErp.rh.dto.source.WeeklyShiftTemplateSource;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Qualifier;

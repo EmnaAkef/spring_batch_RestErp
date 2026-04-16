@@ -1,7 +1,7 @@
 package com.spring_batch.RestErp.rh.batch.reader.config;
 
-import com.spring_batch.RestErp.rh.batch.reader.itemReader.JobOfferItemReader;
-import com.spring_batch.RestErp.rh.dto.source.JobOfferSource;
+import com.spring_batch.RestErp.rh.batch.reader.itemReader.AbsenceMonthlyItemReader;
+import com.spring_batch.RestErp.rh.dto.source.FactAbsenceMonthlySource;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -10,11 +10,11 @@ import org.springframework.context.annotation.Configuration;
 import javax.sql.DataSource;
 
 @Configuration
-public class JobOfferReaderConfig {
+public class AbsenceMonthlyReaderConfig {
 
     @Bean
-    public ItemReader<JobOfferSource> jobOfferReader(
+    public ItemReader<FactAbsenceMonthlySource> absenceMonthlyReader(
             @Qualifier("erpDataSource") DataSource erpDataSource) {
-        return new JobOfferItemReader(erpDataSource);
+        return new AbsenceMonthlyItemReader(erpDataSource);
     }
 }
