@@ -33,6 +33,7 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadFactDealJob;
     private final Job loadFactBillJob;
     private final Job loadFactAssetJob;
+    private final Job loadFactJobApplicationJob;
 
 
     public JobStarter(
@@ -57,7 +58,8 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadFactInvoiceJob") Job loadFactInvoiceJob,
             @Qualifier("loadFactDealJob") Job loadFactDealJob,
             @Qualifier("loadFactBillJob") Job loadFactBillJob,
-            @Qualifier("loadFactAssetJob") Job loadFactAssetJob)  {
+            @Qualifier("loadFactAssetJob") Job loadFactAssetJob,
+            @Qualifier("loadFactJobApplicationJob") Job loadFactJobApplicationJob)  {
 
 
 
@@ -82,6 +84,7 @@ public class JobStarter implements CommandLineRunner {
         this.loadFactDealJob = loadFactDealJob;
         this.loadFactBillJob = loadFactBillJob;
         this.loadFactAssetJob = loadFactAssetJob;
+        this.loadFactJobApplicationJob = loadFactJobApplicationJob;
 
     }
 
@@ -238,6 +241,12 @@ public class JobStarter implements CommandLineRunner {
 //                        .addLong("time", baseTime + 20)
 //                        .toJobParameters()
 //        );
+        jobLauncher.run(
+                loadFactJobApplicationJob,
+                new JobParametersBuilder()
+                        .addLong("time", baseTime + 60)
+                        .toJobParameters()
+        );
 
     }
 }
