@@ -7,11 +7,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class JobOfferItemWriter implements ItemWriter<DimJobOffer> {
 
     private final JdbcTemplate jdbcTemplate;
+    private final Map<Long, Integer> userKeyCache = new HashMap<>();
 
     public JobOfferItemWriter(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -51,7 +54,7 @@ public class JobOfferItemWriter implements ItemWriter<DimJobOffer> {
                 salary_range_min,
                 salary_range_max,
                 status,
-                submitted_user_id,
+                submitted_user_key,
                 effective_from,
                 effective_to,
                 is_current
@@ -74,7 +77,13 @@ public class JobOfferItemWriter implements ItemWriter<DimJobOffer> {
                 dim.setSalaryRangeMin(rs.getBigDecimal("salary_range_min"));
                 dim.setSalaryRangeMax(rs.getBigDecimal("salary_range_max"));
                 dim.setStatus(rs.getString("status"));
-                dim.setSubmittedUserId((Long) rs.getObject("submitted_user_id"));
+
+                // Ici on compare la valeur DW déjà stockée
+                Long submittedUserKey = rs.getObject("submitted_user_key") != null
+                        ? rs.getLong("submitted_user_key")
+                        : null;
+                dim.setSubmittedUserId(submittedUserKey);
+
                 dim.setEffectiveFrom(rs.getTimestamp("effective_from"));
                 dim.setEffectiveTo(rs.getTimestamp("effective_to"));
                 dim.setIsCurrent(rs.getBoolean("is_current"));
@@ -85,6 +94,8 @@ public class JobOfferItemWriter implements ItemWriter<DimJobOffer> {
     }
 
     private boolean isSame(DimJobOffer existing, DimJobOffer incoming) {
+        Integer incomingSubmittedUserKey = getUserKey(incoming.getSubmittedUserId());
+
         return Objects.equals(existing.getJobTitle(), incoming.getJobTitle())
                 && Objects.equals(existing.getEmploymentType(), incoming.getEmploymentType())
                 && Objects.equals(existing.getLocation(), incoming.getLocation())
@@ -94,7 +105,7 @@ public class JobOfferItemWriter implements ItemWriter<DimJobOffer> {
                 && Objects.equals(existing.getSalaryRangeMin(), incoming.getSalaryRangeMin())
                 && Objects.equals(existing.getSalaryRangeMax(), incoming.getSalaryRangeMax())
                 && Objects.equals(existing.getStatus(), incoming.getStatus())
-                && Objects.equals(existing.getSubmittedUserId(), incoming.getSubmittedUserId());
+                && Objects.equals(existing.getSubmittedUserId(), incomingSubmittedUserKey != null ? incomingSubmittedUserKey.longValue() : null);
     }
 
     private void closeCurrentVersion(Integer jobOfferKey) {
@@ -120,12 +131,14 @@ public class JobOfferItemWriter implements ItemWriter<DimJobOffer> {
                 salary_range_min,
                 salary_range_max,
                 status,
-                submitted_user_id,
+                submitted_user_key,
                 effective_from,
                 effective_to,
                 is_current
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
+
+        Integer submittedUserKey = getUserKey(item.getSubmittedUserId());
 
         jdbcTemplate.update(sql,
                 item.getJobOfferId(),
@@ -138,9 +151,34 @@ public class JobOfferItemWriter implements ItemWriter<DimJobOffer> {
                 item.getSalaryRangeMin(),
                 item.getSalaryRangeMax(),
                 item.getStatus(),
-                item.getSubmittedUserId(),
+                submittedUserKey,
                 item.getEffectiveFrom(),
                 item.getEffectiveTo(),
                 item.getIsCurrent());
+    }
+
+    private Integer getUserKey(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+
+        if (userKeyCache.containsKey(userId)) {
+            return userKeyCache.get(userId);
+        }
+
+        Integer userKey = jdbcTemplate.query("""
+            SELECT user_key
+            FROM dim_user
+            WHERE user_id = ?
+              AND is_current = true
+            ORDER BY user_key DESC
+            LIMIT 1
+            """, rs -> rs.next() ? rs.getInt("user_key") : null, userId);
+
+        if (userKey != null) {
+            userKeyCache.put(userId, userKey);
+        }
+
+        return userKey;
     }
 }

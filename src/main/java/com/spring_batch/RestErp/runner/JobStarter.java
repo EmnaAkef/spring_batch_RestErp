@@ -35,6 +35,7 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadFactAssetJob;
     private final Job loadFactJobApplicationJob;
     private final Job loadFactAbsenceMonthlyJob;
+    private final Job loadFactJobOfferJob;
 
 
     public JobStarter(
@@ -61,7 +62,8 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadFactBillJob") Job loadFactBillJob,
             @Qualifier("loadFactAssetJob") Job loadFactAssetJob,
             @Qualifier("loadFactJobApplicationJob") Job loadFactJobApplicationJob,
-            @Qualifier("loadFactAbsenceMonthlyJob") Job loadFactAbsenceMonthlyJob) {
+            @Qualifier("loadFactAbsenceMonthlyJob") Job loadFactAbsenceMonthlyJob,
+            @Qualifier("loadFactJobOfferJob") Job loadFactJobOfferJob) {
 
 
 
@@ -88,6 +90,7 @@ public class JobStarter implements CommandLineRunner {
         this.loadFactAssetJob = loadFactAssetJob;
         this.loadFactJobApplicationJob = loadFactJobApplicationJob;
         this.loadFactAbsenceMonthlyJob = loadFactAbsenceMonthlyJob;
+        this.loadFactJobOfferJob = loadFactJobOfferJob;
     }
 
     @Override
@@ -243,17 +246,23 @@ public class JobStarter implements CommandLineRunner {
 //                        .addLong("time", baseTime + 20)
 //                        .toJobParameters()
 //        );
+//        jobLauncher.run(
+//                loadFactJobApplicationJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 60)
+//                        .toJobParameters()
+//        );
+//
+//        jobLauncher.run(
+//                loadFactAbsenceMonthlyJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 20)
+//                        .toJobParameters()
+//        );
         jobLauncher.run(
-                loadFactJobApplicationJob,
+                loadFactJobOfferJob,
                 new JobParametersBuilder()
-                        .addLong("time", baseTime + 60)
-                        .toJobParameters()
-        );
-
-        jobLauncher.run(
-                loadFactAbsenceMonthlyJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 20)
+                        .addLong("time", baseTime + 70)
                         .toJobParameters()
         );
     }
