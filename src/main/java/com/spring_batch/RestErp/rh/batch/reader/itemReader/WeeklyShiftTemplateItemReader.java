@@ -1,4 +1,4 @@
-package com.spring_batch.RestErp.rh.batch.reader.item;
+package com.spring_batch.RestErp.rh.batch.reader.itemReader;
 
 import com.spring_batch.RestErp.rh.dto.source.WeeklyShiftTemplateSource;
 import org.springframework.batch.item.ItemReader;

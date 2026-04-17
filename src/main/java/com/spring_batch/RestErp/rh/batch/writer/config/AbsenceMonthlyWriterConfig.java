@@ -1,7 +1,7 @@
 package com.spring_batch.RestErp.rh.batch.writer.config;
 
-import com.spring_batch.RestErp.rh.batch.writer.itemWriter.WeeklyShiftTemplateItemWriter;
-import com.spring_batch.RestErp.rh.dto.dim.DimWeeklyShiftTemplate;
+import com.spring_batch.RestErp.rh.batch.writer.itemWriter.AbsenceMonthlyItemWriter;
+import com.spring_batch.RestErp.rh.dto.fact.FactAbsenceMonthly;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -11,11 +11,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 
 @Configuration
-public class WeeklyShiftTemplateWriterConfig {
+public class AbsenceMonthlyWriterConfig {
 
     @Bean
-    public ItemWriter<DimWeeklyShiftTemplate> weeklyShiftTemplateWriter(
+    public ItemWriter<FactAbsenceMonthly> absenceMonthlyWriter(
             @Qualifier("dwDataSource") DataSource dwDataSource) {
-        return new WeeklyShiftTemplateItemWriter(new JdbcTemplate(dwDataSource));
+        return new AbsenceMonthlyItemWriter(new JdbcTemplate(dwDataSource));
     }
 }

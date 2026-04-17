@@ -1,6 +1,6 @@
 package com.spring_batch.RestErp.rh.batch.writer.config;
 
-import com.spring_batch.RestErp.rh.batch.writer.item.DailyShiftTemplateItemWriter;
+import com.spring_batch.RestErp.rh.batch.writer.itemWriter.DailyShiftTemplateItemWriter;
 import com.spring_batch.RestErp.rh.dto.dim.DimDailyShiftTemplate;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Qualifier;

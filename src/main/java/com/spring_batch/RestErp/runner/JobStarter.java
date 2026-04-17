@@ -34,6 +34,7 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadFactBillJob;
     private final Job loadFactAssetJob;
     private final Job loadFactJobApplicationJob;
+    private final Job loadFactAbsenceMonthlyJob;
 
 
     public JobStarter(
@@ -59,7 +60,8 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadFactDealJob") Job loadFactDealJob,
             @Qualifier("loadFactBillJob") Job loadFactBillJob,
             @Qualifier("loadFactAssetJob") Job loadFactAssetJob,
-            @Qualifier("loadFactJobApplicationJob") Job loadFactJobApplicationJob)  {
+            @Qualifier("loadFactJobApplicationJob") Job loadFactJobApplicationJob,
+            @Qualifier("loadFactAbsenceMonthlyJob") Job loadFactAbsenceMonthlyJob) {
 
 
 
@@ -85,7 +87,7 @@ public class JobStarter implements CommandLineRunner {
         this.loadFactBillJob = loadFactBillJob;
         this.loadFactAssetJob = loadFactAssetJob;
         this.loadFactJobApplicationJob = loadFactJobApplicationJob;
-
+        this.loadFactAbsenceMonthlyJob = loadFactAbsenceMonthlyJob;
     }
 
     @Override
@@ -93,12 +95,12 @@ public class JobStarter implements CommandLineRunner {
 
         long baseTime = System.currentTimeMillis();
 
-        jobLauncher.run(
-                loadDimCompanyJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime)
-                        .toJobParameters()
-        );
+//        jobLauncher.run(
+//                loadDimCompanyJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime)
+//                        .toJobParameters()
+//        );
 
 //        jobLauncher.run(
 //                loadDimDepartmentJob,
@@ -248,5 +250,11 @@ public class JobStarter implements CommandLineRunner {
                         .toJobParameters()
         );
 
+        jobLauncher.run(
+                loadFactAbsenceMonthlyJob,
+                new JobParametersBuilder()
+                        .addLong("time", baseTime + 20)
+                        .toJobParameters()
+        );
     }
 }

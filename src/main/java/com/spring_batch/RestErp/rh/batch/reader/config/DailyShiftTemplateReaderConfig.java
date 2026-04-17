@@ -1,6 +1,6 @@
 package com.spring_batch.RestErp.rh.batch.reader.config;
 
-import com.spring_batch.RestErp.rh.batch.reader.item.DailyShiftTemplateRowMapper;
+import com.spring_batch.RestErp.rh.batch.reader.itemReader.DailyShiftTemplateRowMapper;
 import com.spring_batch.RestErp.rh.dto.source.DailyShiftTemplateSource;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Qualifier;
