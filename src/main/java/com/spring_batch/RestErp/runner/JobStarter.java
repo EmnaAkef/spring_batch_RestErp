@@ -37,6 +37,7 @@ public class JobStarter implements CommandLineRunner {
     private final Job loadFactAbsenceMonthlyJob;
     private final Job loadFactJobOfferJob;
     private final  Job loadFactEmployeeHrJob;
+    private final  Job loadFactAttendanceShiftJob;
 
 
     public JobStarter(
@@ -65,7 +66,8 @@ public class JobStarter implements CommandLineRunner {
             @Qualifier("loadFactJobApplicationJob") Job loadFactJobApplicationJob,
             @Qualifier("loadFactAbsenceMonthlyJob") Job loadFactAbsenceMonthlyJob,
             @Qualifier("loadFactJobOfferJob") Job loadFactJobOfferJob,
-            @Qualifier("loadFactEmployeeHrJob") Job loadFactEmployeeHrJob) {
+            @Qualifier("loadFactEmployeeHrJob") Job loadFactEmployeeHrJob,
+            @Qualifier("loadFactAttendanceShiftJob") Job loadFactAttendanceShiftJob) {
 
 
 
@@ -94,6 +96,7 @@ public class JobStarter implements CommandLineRunner {
         this.loadFactAbsenceMonthlyJob = loadFactAbsenceMonthlyJob;
         this.loadFactJobOfferJob = loadFactJobOfferJob;
         this.loadFactEmployeeHrJob = loadFactEmployeeHrJob;
+        this.loadFactAttendanceShiftJob = loadFactAttendanceShiftJob;
     }
 
     @Override
@@ -271,11 +274,19 @@ public class JobStarter implements CommandLineRunner {
 //                        .toJobParameters()
 //        );
 
+//        jobLauncher.run(
+//                loadFactEmployeeHrJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 20)
+//                        .addLong("run.id", baseTime + 120)
+//                        .toJobParameters()
+//        );
+
         jobLauncher.run(
-                loadFactEmployeeHrJob,
+                loadFactAttendanceShiftJob,
                 new JobParametersBuilder()
-                        .addLong("time", baseTime + 20)
-                        .addLong("run.id", baseTime + 120)
+                        .addLong("time", baseTime + 30)
+                        .addLong("run.id", baseTime + 130)
                         .toJobParameters()
         );
     }
