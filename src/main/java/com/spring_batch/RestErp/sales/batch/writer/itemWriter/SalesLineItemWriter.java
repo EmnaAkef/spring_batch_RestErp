@@ -22,15 +22,10 @@ public class SalesLineItemWriter implements ItemWriter<FactSalesLine> {
     }
 
     @Override
-    public void write(Chunk<? extends FactSalesLine> chunk) throws Exception {
+    public void write(Chunk<? extends FactSalesLine> chunk) {
         for (FactSalesLine item : chunk) {
 
             Integer companyKey = getCompanyKey(item.getCompanyId());
-            if (companyKey == null) {
-                throw new IllegalStateException(
-                        "Aucune company trouvée dans dim_company pour company_id = " + item.getCompanyId()
-                );
-            }
             item.setCompanyKey(companyKey);
 
             Integer productKey = getProductKey(item.getCompanyId(), item.getProductId());
@@ -38,6 +33,13 @@ public class SalesLineItemWriter implements ItemWriter<FactSalesLine> {
 
             Integer dateKey = getDateKey(item.getSalesDate());
             item.setDateKey(dateKey);
+
+            // sécurité : ignorer si les clés minimales manquent
+            if (item.getSalesLineId() == null
+                    || item.getCompanyKey() == null
+                    || item.getDateKey() == null) {
+                continue;
+            }
 
             jdbcTemplate.update("""
                 INSERT INTO fact_sales_line (
@@ -57,6 +59,19 @@ public class SalesLineItemWriter implements ItemWriter<FactSalesLine> {
                     line_revenue
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (sales_line_id, company_key)
+                DO UPDATE SET
+                    date_key = EXCLUDED.date_key,
+                    product_key = EXCLUDED.product_key,
+                    quotation_id = EXCLUDED.quotation_id,
+                    invoice_id = EXCLUDED.invoice_id,
+                    sell_order_id = EXCLUDED.sell_order_id,
+                    quantity = EXCLUDED.quantity,
+                    unit_price = EXCLUDED.unit_price,
+                    discount = EXCLUDED.discount,
+                    subtotal = EXCLUDED.subtotal,
+                    tax = EXCLUDED.tax,
+                    line_revenue = EXCLUDED.line_revenue
             """,
                     item.getSalesLineId(),
                     item.getCompanyId(),

@@ -24,15 +24,10 @@ public class DealItemWriter implements ItemWriter<FactDeal> {
     }
 
     @Override
-    public void write(Chunk<? extends FactDeal> chunk) throws Exception {
+    public void write(Chunk<? extends FactDeal> chunk) {
         for (FactDeal item : chunk) {
 
             Integer companyKey = getCompanyKey(item.getCompanyId());
-            if (companyKey == null) {
-                throw new IllegalStateException(
-                        "Aucune company trouvée dans dim_company pour company_id = " + item.getCompanyId()
-                );
-            }
             item.setCompanyKey(companyKey);
 
             Integer closeDateKey = getDateKey(item.getCloseDate());
@@ -46,6 +41,11 @@ public class DealItemWriter implements ItemWriter<FactDeal> {
 
             Integer workstatusKey = getWorkstatusKey(item.getCompanyId(), item.getWorkstatusId());
             item.setWorkstatusKey(workstatusKey);
+
+            // sécurité : ignorer si les clés minimales manquent
+            if (item.getDealId() == null || item.getCompanyKey() == null) {
+                continue;
+            }
 
             jdbcTemplate.update("""
                 INSERT INTO fact_deal (
@@ -62,6 +62,16 @@ public class DealItemWriter implements ItemWriter<FactDeal> {
                     is_archived
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (deal_id, company_key)
+                DO UPDATE SET
+                    close_date_key = EXCLUDED.close_date_key,
+                    customer_key = EXCLUDED.customer_key,
+                    owner_user_key = EXCLUDED.owner_user_key,
+                    workstatus_key = EXCLUDED.workstatus_key,
+                    deal_value = EXCLUDED.deal_value,
+                    deal_count = EXCLUDED.deal_count,
+                    is_closed = EXCLUDED.is_closed,
+                    is_archived = EXCLUDED.is_archived
             """,
                     item.getDealId(),
                     item.getCompanyId(),
