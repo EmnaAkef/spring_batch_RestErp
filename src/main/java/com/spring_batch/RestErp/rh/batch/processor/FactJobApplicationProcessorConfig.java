@@ -22,8 +22,10 @@ public class FactJobApplicationProcessorConfig {
             fact.setApplicationsCount(1);
             fact.setIsHiredFlag(Boolean.TRUE.equals(source.getIsHired()) ? 1 : 0);
 
+            // champs techniques ETL
             fact.setCompanyId(source.getCompanyId());
             fact.setJobOfferId(source.getJobOfferId());
+            fact.setCandidateUserId(source.getCandidateUserId());
             fact.setSubmissionDate(source.getSubmissionDate());
 
             return fact;
