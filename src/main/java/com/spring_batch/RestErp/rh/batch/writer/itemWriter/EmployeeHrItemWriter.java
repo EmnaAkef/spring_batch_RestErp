@@ -23,7 +23,7 @@ public class EmployeeHrItemWriter implements ItemWriter<FactEmployeeHr> {
     }
 
     @Override
-    public void write(Chunk<? extends FactEmployeeHr> chunk) throws Exception {
+    public void write(Chunk<? extends FactEmployeeHr> chunk) {
         for (FactEmployeeHr item : chunk) {
 
             Integer dateKey = getDateKey(item.getFactDate());
@@ -38,7 +38,6 @@ public class EmployeeHrItemWriter implements ItemWriter<FactEmployeeHr> {
             Integer departmentKey = getDepartmentKey(item.getCompanyId(), item.getDepartmentId());
             item.setDepartmentKey(departmentKey);
 
-            // sécurité : ignorer la ligne si une clé obligatoire manque
             if (item.getDateKey() == null
                     || item.getUserKey() == null
                     || item.getCompanyKey() == null
@@ -66,6 +65,22 @@ public class EmployeeHrItemWriter implements ItemWriter<FactEmployeeHr> {
                     is_paid_flag
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (date_key, user_key)
+                DO UPDATE SET
+                    company_key = EXCLUDED.company_key,
+                    department_key = EXCLUDED.department_key,
+                    employee_count = EXCLUDED.employee_count,
+                    is_active_flag = EXCLUDED.is_active_flag,
+                    is_employee_flag = EXCLUDED.is_employee_flag,
+                    onboarding_flag = EXCLUDED.onboarding_flag,
+                    offboarding_flag = EXCLUDED.offboarding_flag,
+                    tenure_days = EXCLUDED.tenure_days,
+                    base_salary = EXCLUDED.base_salary,
+                    final_salary = EXCLUDED.final_salary,
+                    taxes_amount = EXCLUDED.taxes_amount,
+                    insurance_amount = EXCLUDED.insurance_amount,
+                    payroll_count = EXCLUDED.payroll_count,
+                    is_paid_flag = EXCLUDED.is_paid_flag
             """,
                     item.getDateKey(),
                     item.getUserKey(),
