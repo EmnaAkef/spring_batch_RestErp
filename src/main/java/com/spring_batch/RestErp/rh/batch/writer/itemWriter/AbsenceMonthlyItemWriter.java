@@ -22,7 +22,7 @@ public class AbsenceMonthlyItemWriter implements ItemWriter<FactAbsenceMonthly> 
     }
 
     @Override
-    public void write(Chunk<? extends FactAbsenceMonthly> chunk) throws Exception {
+    public void write(Chunk<? extends FactAbsenceMonthly> chunk) {
         for (FactAbsenceMonthly item : chunk) {
 
             Integer monthDateKey = getDateKey(item.getMonthDate());
@@ -51,6 +51,11 @@ public class AbsenceMonthlyItemWriter implements ItemWriter<FactAbsenceMonthly> 
                     absence_rate_pct
                 )
                 VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT (month_date_key, company_key, department_key)
+                DO UPDATE SET
+                    scheduled_shifts_count = EXCLUDED.scheduled_shifts_count,
+                    absent_shifts_count = EXCLUDED.absent_shifts_count,
+                    absence_rate_pct = EXCLUDED.absence_rate_pct
             """,
                     item.getMonthDateKey(),
                     item.getCompanyKey(),

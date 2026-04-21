@@ -1,4 +1,4 @@
-package com.spring_batch.RestErp.rh.batch.writer.item;
+package com.spring_batch.RestErp.rh.batch.writer.itemWriter;
 
 import com.spring_batch.RestErp.rh.dto.fact.FactJobOffer;
 import org.springframework.batch.item.Chunk;
@@ -57,25 +57,19 @@ public class FactJobOfferItemWriter implements ItemWriter<FactJobOffer> {
                     job_offers_count,
                     is_active_flag
                 )
-                SELECT ?, ?, ?, ?, ?, ?
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM public.fact_job_offer
-                    WHERE posting_date_key = ?
-                      AND job_offer_key = ?
-                      AND COALESCE(created_by_user_key, -1) = COALESCE(?, -1)
-                )
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT (posting_date_key, job_offer_key, created_by_user_key)
+                DO UPDATE SET
+                    status = EXCLUDED.status,
+                    job_offers_count = EXCLUDED.job_offers_count,
+                    is_active_flag = EXCLUDED.is_active_flag
             """,
                     item.getPostingDateKey(),
                     item.getJobOfferKey(),
                     item.getCreatedByUserKey(),
                     item.getStatus(),
                     item.getJobOffersCount(),
-                    item.getIsActiveFlag(),
-
-                    item.getPostingDateKey(),
-                    item.getJobOfferKey(),
-                    item.getCreatedByUserKey()
+                    item.getIsActiveFlag()
             );
         }
     }

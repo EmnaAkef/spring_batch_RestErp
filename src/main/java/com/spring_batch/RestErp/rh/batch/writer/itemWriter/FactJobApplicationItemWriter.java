@@ -1,4 +1,4 @@
-package com.spring_batch.RestErp.rh.batch.writer.item;
+package com.spring_batch.RestErp.rh.batch.writer.itemWriter;
 
 import com.spring_batch.RestErp.rh.dto.fact.FactJobApplication;
 import org.springframework.batch.item.Chunk;
@@ -22,28 +22,22 @@ public class FactJobApplicationItemWriter implements ItemWriter<FactJobApplicati
     }
 
     @Override
-    public void write(Chunk<? extends FactJobApplication> chunk) throws Exception {
+    public void write(Chunk<? extends FactJobApplication> chunk) {
         for (FactJobApplication item : chunk) {
 
             Integer submissionDateKey = getDateKey(
                     item.getSubmissionDate() != null ? item.getSubmissionDate().toLocalDate() : null
             );
 
-            if (submissionDateKey == null) {
-                throw new IllegalStateException(
-                        "submission_date_key introuvable pour submissionDate = " + item.getSubmissionDate()
-                );
-            }
-
             Integer jobOfferKey = getJobOfferKey(item.getJobOfferId());
-            if (jobOfferKey == null) {
-                throw new IllegalStateException(
-                        "job_offer_key introuvable pour job_offer_id = " + item.getJobOfferId()
-                );
-            }
 
             item.setSubmissionDateKey(submissionDateKey);
             item.setJobOfferKey(jobOfferKey);
+
+            // sécurité : ignorer si les clés obligatoires manquent
+            if (item.getSubmissionDateKey() == null || item.getJobOfferKey() == null) {
+                continue;
+            }
 
             jdbcTemplate.update("""
                 INSERT INTO public.fact_job_application (
@@ -53,24 +47,17 @@ public class FactJobApplicationItemWriter implements ItemWriter<FactJobApplicati
                     applications_count,
                     is_hired_flag
                 )
-                SELECT ?, ?, ?, ?, ?
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM public.fact_job_application
-                    WHERE submission_date_key = ?
-                      AND job_offer_key = ?
-                      AND COALESCE(application_status, '') = COALESCE(?, '')
-                )
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT (submission_date_key, job_offer_key, application_status)
+                DO UPDATE SET
+                    applications_count = EXCLUDED.applications_count,
+                    is_hired_flag = EXCLUDED.is_hired_flag
             """,
                     item.getSubmissionDateKey(),
                     item.getJobOfferKey(),
                     item.getApplicationStatus(),
                     item.getApplicationsCount(),
-                    item.getIsHiredFlag(),
-
-                    item.getSubmissionDateKey(),
-                    item.getJobOfferKey(),
-                    item.getApplicationStatus()
+                    item.getIsHiredFlag()
             );
         }
     }

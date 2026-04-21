@@ -70,7 +70,7 @@ public class AttendanceShiftItemWriter implements ItemWriter<FactAttendanceShift
                     overtime_hours
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT (date_key, user_key, shift_template_key)
+                ON CONFLICT ON CONSTRAINT uq_fact_attendance_shift_idx
                 DO UPDATE SET
                     company_key = EXCLUDED.company_key,
                     department_key = EXCLUDED.department_key,

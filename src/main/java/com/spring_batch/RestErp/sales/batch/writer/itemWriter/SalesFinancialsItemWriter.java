@@ -23,15 +23,10 @@ public class SalesFinancialsItemWriter implements ItemWriter<FactSalesFinancials
     }
 
     @Override
-    public void write(Chunk<? extends FactSalesFinancials> chunk) throws Exception {
+    public void write(Chunk<? extends FactSalesFinancials> chunk) {
         for (FactSalesFinancials item : chunk) {
 
             Integer companyKey = getCompanyKey(item.getCompanyId());
-            if (companyKey == null) {
-                throw new IllegalStateException(
-                        "Aucune company trouvée dans dim_company pour company_id = " + item.getCompanyId()
-                );
-            }
             item.setCompanyKey(companyKey);
 
             Integer dateKey = getDateKey(item.getSalesDate());
@@ -42,6 +37,11 @@ public class SalesFinancialsItemWriter implements ItemWriter<FactSalesFinancials
 
             Integer agentUserKey = getAgentUserKey(item.getCompanyId(), item.getAgentId());
             item.setAgentUserKey(agentUserKey);
+
+            // sécurité : ignorer la ligne si les clés minimales sont absentes
+            if (item.getInvoiceId() == null || item.getCompanyKey() == null) {
+                continue;
+            }
 
             jdbcTemplate.update("""
                 INSERT INTO fact_sales_financials (
@@ -65,6 +65,23 @@ public class SalesFinancialsItemWriter implements ItemWriter<FactSalesFinancials
                     quotation_state
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (invoice_id, company_key)
+                DO UPDATE SET
+                    date_key = EXCLUDED.date_key,
+                    customer_key = EXCLUDED.customer_key,
+                    agent_user_key = EXCLUDED.agent_user_key,
+                    quotation_id = EXCLUDED.quotation_id,
+                    invoice_total = EXCLUDED.invoice_total,
+                    invoice_untaxed_amount = EXCLUDED.invoice_untaxed_amount,
+                    invoice_count = EXCLUDED.invoice_count,
+                    quotation_count = EXCLUDED.quotation_count,
+                    receipt_count = EXCLUDED.receipt_count,
+                    allocated_amount = EXCLUDED.allocated_amount,
+                    unallocated_amount = EXCLUDED.unallocated_amount,
+                    quotation_total = EXCLUDED.quotation_total,
+                    payment_state = EXCLUDED.payment_state,
+                    invoice_status = EXCLUDED.invoice_status,
+                    quotation_state = EXCLUDED.quotation_state
             """,
                     item.getCompanyId(),
                     item.getCompanyKey(),

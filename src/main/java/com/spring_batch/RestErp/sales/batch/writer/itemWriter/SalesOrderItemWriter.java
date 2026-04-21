@@ -22,15 +22,10 @@ public class SalesOrderItemWriter implements ItemWriter<FactSalesOrder> {
     }
 
     @Override
-    public void write(Chunk<? extends FactSalesOrder> chunk) throws Exception {
+    public void write(Chunk<? extends FactSalesOrder> chunk) {
         for (FactSalesOrder item : chunk) {
 
             Integer companyKey = getCompanyKey(item.getCompanyId());
-            if (companyKey == null) {
-                throw new IllegalStateException(
-                        "Aucune company trouvée dans dim_company pour company_id = " + item.getCompanyId()
-                );
-            }
             item.setCompanyKey(companyKey);
 
             Integer dateKey = getDateKey(item.getOrderDate());
@@ -38,6 +33,13 @@ public class SalesOrderItemWriter implements ItemWriter<FactSalesOrder> {
 
             Integer customerKey = getCustomerKey(item.getCompanyId(), item.getCustomerId());
             item.setCustomerKey(customerKey);
+
+            // sécurité : ignorer la ligne si les clés minimales sont absentes
+            if (item.getSellOrderId() == null
+                    || item.getCompanyKey() == null
+                    || item.getDateKey() == null) {
+                continue;
+            }
 
             jdbcTemplate.update("""
                 INSERT INTO fact_sales_order (
@@ -52,6 +54,14 @@ public class SalesOrderItemWriter implements ItemWriter<FactSalesOrder> {
                     status
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (sell_order_id, company_key)
+                DO UPDATE SET
+                    date_key = EXCLUDED.date_key,
+                    customer_key = EXCLUDED.customer_key,
+                    quotation_id = EXCLUDED.quotation_id,
+                    invoice_id = EXCLUDED.invoice_id,
+                    so_count = EXCLUDED.so_count,
+                    status = EXCLUDED.status
             """,
                     item.getSellOrderId(),
                     item.getCompanyId(),
