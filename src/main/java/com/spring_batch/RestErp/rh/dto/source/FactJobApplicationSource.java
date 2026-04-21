@@ -9,6 +9,7 @@ public class FactJobApplicationSource {
     private String schemaName;
 
     private Long jobOfferId;
+    private Long candidateUserId;
 
     private String applicationStatus;
     private LocalDateTime submissionDate;
@@ -47,6 +48,14 @@ public class FactJobApplicationSource {
 
     public void setJobOfferId(Long jobOfferId) {
         this.jobOfferId = jobOfferId;
+    }
+
+    public Long getCandidateUserId() {
+        return candidateUserId;
+    }
+
+    public void setCandidateUserId(Long candidateUserId) {
+        this.candidateUserId = candidateUserId;
     }
 
     public String getApplicationStatus() {

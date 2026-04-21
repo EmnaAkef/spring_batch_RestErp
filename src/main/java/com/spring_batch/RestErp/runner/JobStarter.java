@@ -253,12 +253,12 @@ public class JobStarter implements CommandLineRunner {
 //                        .toJobParameters()
 //        );
 
-//        jobLauncher.run(       //fama err
-//                loadFactJobApplicationJob,
-//                new JobParametersBuilder()
-//                        .addLong("time", baseTime + 60)
-//                        .toJobParameters()
-//        );
+        jobLauncher.run(
+                loadFactJobApplicationJob,
+                new JobParametersBuilder()
+                        .addLong("time", baseTime + 60)
+                        .toJobParameters()
+        );
 
 //        jobLauncher.run(
 //                loadFactAbsenceMonthlyJob,
@@ -282,12 +282,12 @@ public class JobStarter implements CommandLineRunner {
 //                        .toJobParameters()
 //        );
 
-        jobLauncher.run(
-                loadFactAttendanceShiftJob,
-                new JobParametersBuilder()
-                        .addLong("time", baseTime + 30)
-                        .addLong("run.id", baseTime + 130)
-                        .toJobParameters()
-        );
+//        jobLauncher.run(
+//                loadFactAttendanceShiftJob,
+//                new JobParametersBuilder()
+//                        .addLong("time", baseTime + 30)
+//                        .addLong("run.id", baseTime + 130)
+//                        .toJobParameters()
+//        );
     }
 }

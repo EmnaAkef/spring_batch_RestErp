@@ -1,4 +1,4 @@
-package com.spring_batch.RestErp.rh.batch.reader.item;
+package com.spring_batch.RestErp.rh.batch.reader.itemReader;
 
 import com.spring_batch.RestErp.rh.dto.source.FactJobApplicationSource;
 import org.springframework.batch.item.ItemReader;
@@ -56,36 +56,54 @@ public class FactJobApplicationItemReader implements ItemReader<FactJobApplicati
 
             String sql = """
                 SELECT
-                    ja.id,
-                    ja.job_offer_id,
-                    ja.application_status,
-                    ja.submission_date,
-                    ja.is_hired
-                FROM %s.jobsubmissionmodel ja
-                ORDER BY ja.id
-            """.formatted(schemaName);
+                    js.id,
+                    js.job_offer_id,
+                    jo.user_submited_id,
+                    js.status,
+                    js.submission_date,
+                    js.timestamp
+                FROM %s.jobsubmissionmodel js
+                LEFT JOIN %s.job_offer_model jo
+                       ON jo.id = js.job_offer_id
+                ORDER BY js.id
+            """.formatted(schemaName, schemaName);
 
             List<FactJobApplicationSource> result = jdbcTemplate.query(sql, (rs, rowNum) -> {
 
-                FactJobApplicationSource application = new FactJobApplicationSource();
+                FactJobApplicationSource item = new FactJobApplicationSource();
 
-                application.setApplicationId(rs.getLong("id"));
-                application.setCompanyId(companyId);
-                application.setSchemaName(schemaName);
+                item.setApplicationId(rs.getLong("id"));
+                item.setCompanyId(companyId);
+                item.setSchemaName(schemaName);
 
-                application.setJobOfferId((Long) rs.getObject("job_offer_id"));
-                application.setApplicationStatus(rs.getString("application_status"));
-                application.setIsHired((Boolean) rs.getObject("is_hired"));
+                item.setJobOfferId((Long) rs.getObject("job_offer_id"));
+                item.setCandidateUserId((Long) rs.getObject("user_submited_id"));
+                item.setApplicationStatus(rs.getString("status"));
 
                 Timestamp submissionTs = rs.getTimestamp("submission_date");
                 if (submissionTs != null) {
-                    application.setSubmissionDate(submissionTs.toLocalDateTime());
+                    item.setSubmissionDate(submissionTs.toLocalDateTime());
+                } else {
+                    Timestamp ts = rs.getTimestamp("timestamp");
+                    if (ts != null) {
+                        item.setSubmissionDate(ts.toLocalDateTime());
+                    }
                 }
 
-                return application;
+                item.setIsHired(isHiredStatus(rs.getString("status")));
+
+                return item;
             });
 
             applications.addAll(result);
         }
+    }
+
+    private Boolean isHiredStatus(String status) {
+        if (status == null) {
+            return false;
+        }
+
+        return status.trim().equalsIgnoreCase("ACTIVE");
     }
 }

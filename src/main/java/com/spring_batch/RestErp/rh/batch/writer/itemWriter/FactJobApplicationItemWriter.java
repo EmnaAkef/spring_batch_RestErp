@@ -16,6 +16,7 @@ public class FactJobApplicationItemWriter implements ItemWriter<FactJobApplicati
 
     private final Map<LocalDate, Integer> dateKeyCache = new HashMap<>();
     private final Map<Long, Integer> jobOfferKeyCache = new HashMap<>();
+    private final Map<Long, Integer> userKeyCache = new HashMap<>();
 
     public FactJobApplicationItemWriter(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -28,7 +29,6 @@ public class FactJobApplicationItemWriter implements ItemWriter<FactJobApplicati
             Integer submissionDateKey = getDateKey(
                     item.getSubmissionDate() != null ? item.getSubmissionDate().toLocalDate() : null
             );
-
             if (submissionDateKey == null) {
                 throw new IllegalStateException(
                         "submission_date_key introuvable pour submissionDate = " + item.getSubmissionDate()
@@ -42,35 +42,40 @@ public class FactJobApplicationItemWriter implements ItemWriter<FactJobApplicati
                 );
             }
 
+            Integer candidateUserKey = getUserKey(item.getCandidateUserId());
+
             item.setSubmissionDateKey(submissionDateKey);
             item.setJobOfferKey(jobOfferKey);
+            item.setCandidateUserKey(candidateUserKey);
 
             jdbcTemplate.update("""
                 INSERT INTO public.fact_job_application (
                     submission_date_key,
                     job_offer_key,
+                    candidate_user_key,
                     application_status,
                     applications_count,
                     is_hired_flag
                 )
-                SELECT ?, ?, ?, ?, ?
+                SELECT ?, ?, ?, ?, ?, ?
                 WHERE NOT EXISTS (
                     SELECT 1
                     FROM public.fact_job_application
                     WHERE submission_date_key = ?
                       AND job_offer_key = ?
-                      AND COALESCE(application_status, '') = COALESCE(?, '')
+                      AND COALESCE(candidate_user_key, -1) = COALESCE(?, -1)
                 )
             """,
                     item.getSubmissionDateKey(),
                     item.getJobOfferKey(),
+                    item.getCandidateUserKey(),
                     item.getApplicationStatus(),
                     item.getApplicationsCount(),
                     item.getIsHiredFlag(),
 
                     item.getSubmissionDateKey(),
                     item.getJobOfferKey(),
-                    item.getApplicationStatus()
+                    item.getCandidateUserKey()
             );
         }
     }
@@ -121,5 +126,30 @@ public class FactJobApplicationItemWriter implements ItemWriter<FactJobApplicati
         }
 
         return jobOfferKey;
+    }
+
+    private Integer getUserKey(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+
+        if (userKeyCache.containsKey(userId)) {
+            return userKeyCache.get(userId);
+        }
+
+        Integer userKey = jdbcTemplate.query("""
+            SELECT user_key
+            FROM public.dim_user
+            WHERE user_id = ?
+              AND is_current = TRUE
+            ORDER BY user_key DESC
+            LIMIT 1
+        """, rs -> rs.next() ? rs.getInt("user_key") : null, userId);
+
+        if (userKey != null) {
+            userKeyCache.put(userId, userKey);
+        }
+
+        return userKey;
     }
 }

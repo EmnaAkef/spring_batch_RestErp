@@ -1,6 +1,6 @@
 package com.spring_batch.RestErp.rh.batch.reader.config;
 
-import com.spring_batch.RestErp.rh.batch.reader.item.FactJobApplicationItemReader;
+import com.spring_batch.RestErp.rh.batch.reader.itemReader.FactJobApplicationItemReader;
 import com.spring_batch.RestErp.rh.dto.source.FactJobApplicationSource;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Qualifier;
