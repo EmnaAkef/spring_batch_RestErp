@@ -23,33 +23,20 @@ public class FactAssetItemWriter implements ItemWriter<FactAsset> {
     }
 
     @Override
-    public void write(Chunk<? extends FactAsset> chunk) throws Exception {
+    public void write(Chunk<? extends FactAsset> chunk) {
         for (FactAsset item : chunk) {
 
             Integer companyKey = getCompanyKey(item.getCompanyId());
-            if (companyKey == null) {
-                throw new IllegalStateException(
-                        "company_key introuvable pour company_id = " + item.getCompanyId()
-                );
-            }
-
             Integer dateKey = getDateKey(item.getAssignDate() != null ? item.getAssignDate().toLocalDate() : null);
-            if (dateKey == null) {
-                throw new IllegalStateException(
-                        "date_key introuvable pour assign_date = " + item.getAssignDate()
-                );
-            }
-
             Integer assetTypeKey = getAssetTypeKey(item.getAssetType());
-            if (assetTypeKey == null) {
-                throw new IllegalStateException(
-                        "asset_type_key introuvable pour asset_type = " + item.getAssetType()
-                );
-            }
 
             item.setCompanyKey(companyKey);
             item.setDateKey(dateKey);
             item.setAssetTypeKey(assetTypeKey);
+
+            if (item.getAssetId() == null || item.getCompanyKey() == null || item.getDateKey() == null || item.getAssetTypeKey() == null) {
+                continue;
+            }
 
             jdbcTemplate.update("""
                 INSERT INTO public.fact_asset (
@@ -64,13 +51,17 @@ public class FactAssetItemWriter implements ItemWriter<FactAsset> {
                     years_duration,
                     asset_count
                 )
-                SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM public.fact_asset
-                    WHERE asset_id = ?
-                      AND company_key = ?
-                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (asset_id, company_key)
+                DO UPDATE SET
+                    date_key = EXCLUDED.date_key,
+                    asset_type_key = EXCLUDED.asset_type_key,
+                    asset_value = EXCLUDED.asset_value,
+                    depreciation_amount = EXCLUDED.depreciation_amount,
+                    net_book_value = EXCLUDED.net_book_value,
+                    percentage = EXCLUDED.percentage,
+                    years_duration = EXCLUDED.years_duration,
+                    asset_count = EXCLUDED.asset_count
             """,
                     item.getAssetId(),
                     item.getDateKey(),
@@ -81,22 +72,14 @@ public class FactAssetItemWriter implements ItemWriter<FactAsset> {
                     item.getNetBookValue(),
                     item.getPercentage(),
                     item.getYearsDuration(),
-                    item.getAssetCount(),
-
-                    item.getAssetId(),
-                    item.getCompanyKey()
+                    item.getAssetCount()
             );
         }
     }
 
     private Integer getCompanyKey(Long companyId) {
-        if (companyId == null) {
-            return null;
-        }
-
-        if (companyKeyCache.containsKey(companyId)) {
-            return companyKeyCache.get(companyId);
-        }
+        if (companyId == null) return null;
+        if (companyKeyCache.containsKey(companyId)) return companyKeyCache.get(companyId);
 
         Integer companyKey = jdbcTemplate.query("""
             SELECT company_key
@@ -107,21 +90,13 @@ public class FactAssetItemWriter implements ItemWriter<FactAsset> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("company_key") : null, companyId);
 
-        if (companyKey != null) {
-            companyKeyCache.put(companyId, companyKey);
-        }
-
+        if (companyKey != null) companyKeyCache.put(companyId, companyKey);
         return companyKey;
     }
 
     private Integer getDateKey(LocalDate date) {
-        if (date == null) {
-            return null;
-        }
-
-        if (dateKeyCache.containsKey(date)) {
-            return dateKeyCache.get(date);
-        }
+        if (date == null) return null;
+        if (dateKeyCache.containsKey(date)) return dateKeyCache.get(date);
 
         Integer dateKey = jdbcTemplate.query("""
             SELECT date_key
@@ -130,23 +105,15 @@ public class FactAssetItemWriter implements ItemWriter<FactAsset> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("date_key") : null, Date.valueOf(date));
 
-        if (dateKey != null) {
-            dateKeyCache.put(date, dateKey);
-        }
-
+        if (dateKey != null) dateKeyCache.put(date, dateKey);
         return dateKey;
     }
 
     private Integer getAssetTypeKey(String assetType) {
-        if (assetType == null || assetType.isBlank()) {
-            return null;
-        }
+        if (assetType == null || assetType.isBlank()) return null;
 
         String normalized = assetType.trim();
-
-        if (assetTypeKeyCache.containsKey(normalized)) {
-            return assetTypeKeyCache.get(normalized);
-        }
+        if (assetTypeKeyCache.containsKey(normalized)) return assetTypeKeyCache.get(normalized);
 
         Integer assetTypeKey = jdbcTemplate.query("""
             SELECT asset_type_key
@@ -155,10 +122,7 @@ public class FactAssetItemWriter implements ItemWriter<FactAsset> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("asset_type_key") : null, normalized);
 
-        if (assetTypeKey != null) {
-            assetTypeKeyCache.put(normalized, assetTypeKey);
-        }
-
+        if (assetTypeKey != null) assetTypeKeyCache.put(normalized, assetTypeKey);
         return assetTypeKey;
     }
 }

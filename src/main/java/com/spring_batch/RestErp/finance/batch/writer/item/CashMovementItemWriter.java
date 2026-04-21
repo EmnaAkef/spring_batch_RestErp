@@ -23,32 +23,24 @@ public class CashMovementItemWriter implements ItemWriter<FactCashMovement> {
     }
 
     @Override
-    public void write(Chunk<? extends FactCashMovement> chunk) throws Exception {
+    public void write(Chunk<? extends FactCashMovement> chunk) {
         for (FactCashMovement item : chunk) {
 
             Integer companyKey = getCompanyKey(item.getCompanyId());
-            if (companyKey == null) {
-                throw new IllegalStateException("company_key introuvable pour company_id = " + item.getCompanyId());
-            }
-
             Integer chartAccountKey = getChartAccountKey(item.getCompanyId(), item.getChartId());
-            if (chartAccountKey == null) {
-                throw new IllegalStateException("chart_key introuvable pour company_id = "
-                        + item.getCompanyId() + " et chart_id = " + item.getChartId());
-            }
-
             Integer userKey = getUserKey(item.getCompanyId(), item.getUserId());
 
-            LocalDate movementDate = item.getTimestamp().toLocalDate();
+            LocalDate movementDate = item.getTimestamp() != null ? item.getTimestamp().toLocalDate() : null;
             Integer dateKey = getDateKey(movementDate);
-            if (dateKey == null) {
-                throw new IllegalStateException("date_key introuvable pour date = " + movementDate);
-            }
 
             item.setCompanyKey(companyKey);
             item.setChartAccountKey(chartAccountKey);
             item.setUserKey(userKey);
             item.setDateKey(dateKey);
+
+            if (item.getCashId() == null || item.getCompanyKey() == null || item.getChartAccountKey() == null || item.getDateKey() == null) {
+                continue;
+            }
 
             jdbcTemplate.update("""
                 INSERT INTO public.fact_cash_movement (
@@ -65,13 +57,19 @@ public class CashMovementItemWriter implements ItemWriter<FactCashMovement> {
                     credit_reconciliation,
                     reconciliation_gap
                 )
-                SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM public.fact_cash_movement
-                    WHERE cash_id = ?
-                      AND company_key = ?
-                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (cash_id, company_key)
+                DO UPDATE SET
+                    date_key = EXCLUDED.date_key,
+                    chart_account_key = EXCLUDED.chart_account_key,
+                    user_key = EXCLUDED.user_key,
+                    debit = EXCLUDED.debit,
+                    credit = EXCLUDED.credit,
+                    net_amount = EXCLUDED.net_amount,
+                    opening_balance = EXCLUDED.opening_balance,
+                    debit_reconciliation = EXCLUDED.debit_reconciliation,
+                    credit_reconciliation = EXCLUDED.credit_reconciliation,
+                    reconciliation_gap = EXCLUDED.reconciliation_gap
             """,
                     item.getCashId(),
                     item.getDateKey(),
@@ -84,22 +82,14 @@ public class CashMovementItemWriter implements ItemWriter<FactCashMovement> {
                     item.getOpeningBalance(),
                     item.getDebitReconciliation(),
                     item.getCreditReconciliation(),
-                    item.getReconciliationGap(),
-
-                    item.getCashId(),
-                    item.getCompanyKey()
+                    item.getReconciliationGap()
             );
         }
     }
 
     private Integer getCompanyKey(Long companyId) {
-        if (companyId == null) {
-            return null;
-        }
-
-        if (companyKeyCache.containsKey(companyId)) {
-            return companyKeyCache.get(companyId);
-        }
+        if (companyId == null) return null;
+        if (companyKeyCache.containsKey(companyId)) return companyKeyCache.get(companyId);
 
         Integer companyKey = jdbcTemplate.query("""
             SELECT company_key
@@ -110,23 +100,15 @@ public class CashMovementItemWriter implements ItemWriter<FactCashMovement> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("company_key") : null, companyId);
 
-        if (companyKey != null) {
-            companyKeyCache.put(companyId, companyKey);
-        }
-
+        if (companyKey != null) companyKeyCache.put(companyId, companyKey);
         return companyKey;
     }
 
     private Integer getChartAccountKey(Long companyId, Long chartId) {
-        if (companyId == null || chartId == null) {
-            return null;
-        }
+        if (companyId == null || chartId == null) return null;
 
         String cacheKey = companyId + "_" + chartId;
-
-        if (chartAccountKeyCache.containsKey(cacheKey)) {
-            return chartAccountKeyCache.get(cacheKey);
-        }
+        if (chartAccountKeyCache.containsKey(cacheKey)) return chartAccountKeyCache.get(cacheKey);
 
         Integer chartAccountKey = jdbcTemplate.query("""
             SELECT chart_key
@@ -138,23 +120,15 @@ public class CashMovementItemWriter implements ItemWriter<FactCashMovement> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("chart_key") : null, companyId, chartId);
 
-        if (chartAccountKey != null) {
-            chartAccountKeyCache.put(cacheKey, chartAccountKey);
-        }
-
+        if (chartAccountKey != null) chartAccountKeyCache.put(cacheKey, chartAccountKey);
         return chartAccountKey;
     }
 
     private Integer getUserKey(Long companyId, Long userId) {
-        if (companyId == null || userId == null) {
-            return null;
-        }
+        if (companyId == null || userId == null) return null;
 
         String cacheKey = companyId + "_" + userId;
-
-        if (userKeyCache.containsKey(cacheKey)) {
-            return userKeyCache.get(cacheKey);
-        }
+        if (userKeyCache.containsKey(cacheKey)) return userKeyCache.get(cacheKey);
 
         Integer userKey = jdbcTemplate.query("""
             SELECT user_key
@@ -166,21 +140,13 @@ public class CashMovementItemWriter implements ItemWriter<FactCashMovement> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("user_key") : null, companyId, userId);
 
-        if (userKey != null) {
-            userKeyCache.put(cacheKey, userKey);
-        }
-
+        if (userKey != null) userKeyCache.put(cacheKey, userKey);
         return userKey;
     }
 
     private Integer getDateKey(LocalDate date) {
-        if (date == null) {
-            return null;
-        }
-
-        if (dateKeyCache.containsKey(date)) {
-            return dateKeyCache.get(date);
-        }
+        if (date == null) return null;
+        if (dateKeyCache.containsKey(date)) return dateKeyCache.get(date);
 
         Integer dateKey = jdbcTemplate.query("""
             SELECT date_key
@@ -189,10 +155,7 @@ public class CashMovementItemWriter implements ItemWriter<FactCashMovement> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("date_key") : null, java.sql.Date.valueOf(date));
 
-        if (dateKey != null) {
-            dateKeyCache.put(date, dateKey);
-        }
-
+        if (dateKey != null) dateKeyCache.put(date, dateKey);
         return dateKey;
     }
 }

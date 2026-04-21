@@ -22,31 +22,16 @@ public class ChartBalanceSnapshotItemWriter implements ItemWriter<ChartBalanceSn
     }
 
     @Override
-    public void write(Chunk<? extends ChartBalanceSnapshotSource> chunk) throws Exception {
+    public void write(Chunk<? extends ChartBalanceSnapshotSource> chunk) {
         for (ChartBalanceSnapshotSource item : chunk) {
 
             Integer companyKey = getCompanyKey(item.getCompanyId());
-            if (companyKey == null) {
-                throw new IllegalStateException(
-                        "company_key introuvable pour company_id = " + item.getCompanyId()
-                );
-            }
-
-            LocalDate balanceDate = item.getTimestamp().toLocalDate();
-
+            LocalDate balanceDate = item.getTimestamp() != null ? item.getTimestamp().toLocalDate() : null;
             Integer dateKey = getDateKey(balanceDate);
-            if (dateKey == null) {
-                throw new IllegalStateException(
-                        "date_key introuvable pour date = " + balanceDate
-                );
-            }
-
             Integer chartAccountKey = getChartAccountKey(item.getCompanyId(), item.getChartId());
-            if (chartAccountKey == null) {
-                throw new IllegalStateException(
-                        "chart_key introuvable dans dim_chart_account pour company_id = "
-                                + item.getCompanyId() + " et chart_id = " + item.getChartId()
-                );
+
+            if (companyKey == null || dateKey == null || chartAccountKey == null) {
+                continue;
             }
 
             jdbcTemplate.update("""
@@ -61,14 +46,15 @@ public class ChartBalanceSnapshotItemWriter implements ItemWriter<ChartBalanceSn
                     total_movement_debit,
                     total_movement_credit
                 )
-                SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM public.fact_chart_balance_snapshot
-                    WHERE chart_account_key = ?
-                      AND date_key = ?
-                      AND company_key = ?
-                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (chart_account_key, date_key, company_key)
+                DO UPDATE SET
+                    close_balance_debit = EXCLUDED.close_balance_debit,
+                    close_balance_credit = EXCLUDED.close_balance_credit,
+                    open_balance_debit = EXCLUDED.open_balance_debit,
+                    open_balance_credit = EXCLUDED.open_balance_credit,
+                    total_movement_debit = EXCLUDED.total_movement_debit,
+                    total_movement_credit = EXCLUDED.total_movement_credit
             """,
                     chartAccountKey,
                     dateKey,
@@ -78,23 +64,14 @@ public class ChartBalanceSnapshotItemWriter implements ItemWriter<ChartBalanceSn
                     item.getOpenBalanceDebit(),
                     item.getOpenBalanceCredit(),
                     item.getTotalMovementDebit(),
-                    item.getTotalMovementCredit(),
-
-                    chartAccountKey,
-                    dateKey,
-                    companyKey
+                    item.getTotalMovementCredit()
             );
         }
     }
 
     private Integer getCompanyKey(Long companyId) {
-        if (companyId == null) {
-            return null;
-        }
-
-        if (companyKeyCache.containsKey(companyId)) {
-            return companyKeyCache.get(companyId);
-        }
+        if (companyId == null) return null;
+        if (companyKeyCache.containsKey(companyId)) return companyKeyCache.get(companyId);
 
         Integer companyKey = jdbcTemplate.query("""
             SELECT company_key
@@ -105,21 +82,13 @@ public class ChartBalanceSnapshotItemWriter implements ItemWriter<ChartBalanceSn
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("company_key") : null, companyId);
 
-        if (companyKey != null) {
-            companyKeyCache.put(companyId, companyKey);
-        }
-
+        if (companyKey != null) companyKeyCache.put(companyId, companyKey);
         return companyKey;
     }
 
     private Integer getDateKey(LocalDate date) {
-        if (date == null) {
-            return null;
-        }
-
-        if (dateKeyCache.containsKey(date)) {
-            return dateKeyCache.get(date);
-        }
+        if (date == null) return null;
+        if (dateKeyCache.containsKey(date)) return dateKeyCache.get(date);
 
         Integer dateKey = jdbcTemplate.query("""
             SELECT date_key
@@ -128,23 +97,15 @@ public class ChartBalanceSnapshotItemWriter implements ItemWriter<ChartBalanceSn
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("date_key") : null, java.sql.Date.valueOf(date));
 
-        if (dateKey != null) {
-            dateKeyCache.put(date, dateKey);
-        }
-
+        if (dateKey != null) dateKeyCache.put(date, dateKey);
         return dateKey;
     }
 
     private Integer getChartAccountKey(Long companyId, Long chartId) {
-        if (companyId == null || chartId == null) {
-            return null;
-        }
+        if (companyId == null || chartId == null) return null;
 
         String cacheKey = companyId + "_" + chartId;
-
-        if (chartAccountKeyCache.containsKey(cacheKey)) {
-            return chartAccountKeyCache.get(cacheKey);
-        }
+        if (chartAccountKeyCache.containsKey(cacheKey)) return chartAccountKeyCache.get(cacheKey);
 
         Integer chartAccountKey = jdbcTemplate.query("""
             SELECT chart_key
@@ -156,10 +117,7 @@ public class ChartBalanceSnapshotItemWriter implements ItemWriter<ChartBalanceSn
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("chart_key") : null, companyId, chartId);
 
-        if (chartAccountKey != null) {
-            chartAccountKeyCache.put(cacheKey, chartAccountKey);
-        }
-
+        if (chartAccountKey != null) chartAccountKeyCache.put(cacheKey, chartAccountKey);
         return chartAccountKey;
     }
 }

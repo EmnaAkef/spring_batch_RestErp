@@ -25,36 +25,18 @@ public class FactInvoiceItemWriter implements ItemWriter<FactInvoice> {
     }
 
     @Override
-    public void write(Chunk<? extends FactInvoice> chunk) throws Exception {
+    public void write(Chunk<? extends FactInvoice> chunk) {
         for (FactInvoice item : chunk) {
 
             Integer companyKey = getCompanyKey(item.getCompanyId());
-            if (companyKey == null) {
-                throw new IllegalStateException(
-                        "company_key introuvable pour company_id = " + item.getCompanyId()
-                );
-            }
-
             Integer customerKey = getCustomerKey(item.getCompanyId(), item.getCustomerId());
             Integer salespersonUserKey = getUserKey(item.getCompanyId(), item.getAgentId());
 
             Integer dateKey = getDateKey(item.getIssueDate() != null ? item.getIssueDate().toLocalDate() : null);
-            if (dateKey == null) {
-                throw new IllegalStateException(
-                        "date_key introuvable pour issue_date = " + item.getIssueDate()
-                );
-            }
-
             Integer dueDateKey = getDateKey(item.getDueDate() != null ? item.getDueDate().toLocalDate() : null);
 
             String statusCode = mapStatusToCode(item.getStatus());
             Integer statusKey = getStatusKey(statusCode);
-            if (statusKey == null) {
-                throw new IllegalStateException(
-                        "status_key introuvable pour status source = " + item.getStatus()
-                                + " (status_code = " + statusCode + ")"
-                );
-            }
 
             item.setCompanyKey(companyKey);
             item.setCustomerKey(customerKey);
@@ -62,6 +44,10 @@ public class FactInvoiceItemWriter implements ItemWriter<FactInvoice> {
             item.setDateKey(dateKey);
             item.setDueDateKey(dueDateKey);
             item.setStatusKey(statusKey);
+
+            if (item.getInvoiceId() == null || item.getCompanyKey() == null || item.getDateKey() == null || item.getStatusKey() == null) {
+                continue;
+            }
 
             jdbcTemplate.update("""
                 INSERT INTO public.fact_invoice (
@@ -82,13 +68,23 @@ public class FactInvoiceItemWriter implements ItemWriter<FactInvoice> {
                     partial_paid_amount,
                     invoice_count
                 )
-                SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM public.fact_invoice
-                    WHERE invoice_id = ?
-                      AND company_key = ?
-                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (invoice_id, company_key)
+                DO UPDATE SET
+                    date_key = EXCLUDED.date_key,
+                    due_date_key = EXCLUDED.due_date_key,
+                    customer_key = EXCLUDED.customer_key,
+                    salesperson_user_key = EXCLUDED.salesperson_user_key,
+                    status_key = EXCLUDED.status_key,
+                    project_id = EXCLUDED.project_id,
+                    invoicenumber = EXCLUDED.invoicenumber,
+                    invoicetype = EXCLUDED.invoicetype,
+                    payment_type = EXCLUDED.payment_type,
+                    total = EXCLUDED.total,
+                    untaxed_amount = EXCLUDED.untaxed_amount,
+                    tax = EXCLUDED.tax,
+                    partial_paid_amount = EXCLUDED.partial_paid_amount,
+                    invoice_count = EXCLUDED.invoice_count
             """,
                     item.getInvoiceId(),
                     item.getDateKey(),
@@ -105,22 +101,14 @@ public class FactInvoiceItemWriter implements ItemWriter<FactInvoice> {
                     item.getUntaxedAmount(),
                     item.getTax(),
                     item.getPartialPaidAmount(),
-                    item.getInvoiceCount(),
-
-                    item.getInvoiceId(),
-                    item.getCompanyKey()
+                    item.getInvoiceCount()
             );
         }
     }
 
     private Integer getCompanyKey(Long companyId) {
-        if (companyId == null) {
-            return null;
-        }
-
-        if (companyKeyCache.containsKey(companyId)) {
-            return companyKeyCache.get(companyId);
-        }
+        if (companyId == null) return null;
+        if (companyKeyCache.containsKey(companyId)) return companyKeyCache.get(companyId);
 
         Integer companyKey = jdbcTemplate.query("""
             SELECT company_key
@@ -131,23 +119,15 @@ public class FactInvoiceItemWriter implements ItemWriter<FactInvoice> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("company_key") : null, companyId);
 
-        if (companyKey != null) {
-            companyKeyCache.put(companyId, companyKey);
-        }
-
+        if (companyKey != null) companyKeyCache.put(companyId, companyKey);
         return companyKey;
     }
 
     private Integer getCustomerKey(Long companyId, Long customerId) {
-        if (companyId == null || customerId == null) {
-            return null;
-        }
+        if (companyId == null || customerId == null) return null;
 
         String cacheKey = companyId + "_" + customerId;
-
-        if (customerKeyCache.containsKey(cacheKey)) {
-            return customerKeyCache.get(cacheKey);
-        }
+        if (customerKeyCache.containsKey(cacheKey)) return customerKeyCache.get(cacheKey);
 
         Integer customerKey = jdbcTemplate.query("""
             SELECT customer_key
@@ -159,23 +139,15 @@ public class FactInvoiceItemWriter implements ItemWriter<FactInvoice> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("customer_key") : null, companyId, customerId);
 
-        if (customerKey != null) {
-            customerKeyCache.put(cacheKey, customerKey);
-        }
-
+        if (customerKey != null) customerKeyCache.put(cacheKey, customerKey);
         return customerKey;
     }
 
     private Integer getUserKey(Long companyId, Long userId) {
-        if (companyId == null || userId == null) {
-            return null;
-        }
+        if (companyId == null || userId == null) return null;
 
         String cacheKey = companyId + "_" + userId;
-
-        if (userKeyCache.containsKey(cacheKey)) {
-            return userKeyCache.get(cacheKey);
-        }
+        if (userKeyCache.containsKey(cacheKey)) return userKeyCache.get(cacheKey);
 
         Integer userKey = jdbcTemplate.query("""
             SELECT user_key
@@ -187,21 +159,13 @@ public class FactInvoiceItemWriter implements ItemWriter<FactInvoice> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("user_key") : null, companyId, userId);
 
-        if (userKey != null) {
-            userKeyCache.put(cacheKey, userKey);
-        }
-
+        if (userKey != null) userKeyCache.put(cacheKey, userKey);
         return userKey;
     }
 
     private Integer getDateKey(LocalDate date) {
-        if (date == null) {
-            return null;
-        }
-
-        if (dateKeyCache.containsKey(date)) {
-            return dateKeyCache.get(date);
-        }
+        if (date == null) return null;
+        if (dateKeyCache.containsKey(date)) return dateKeyCache.get(date);
 
         Integer dateKey = jdbcTemplate.query("""
             SELECT date_key
@@ -210,17 +174,12 @@ public class FactInvoiceItemWriter implements ItemWriter<FactInvoice> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("date_key") : null, Date.valueOf(date));
 
-        if (dateKey != null) {
-            dateKeyCache.put(date, dateKey);
-        }
-
+        if (dateKey != null) dateKeyCache.put(date, dateKey);
         return dateKey;
     }
 
     private String mapStatusToCode(Integer status) {
-        if (status == null) {
-            return null;
-        }
+        if (status == null) return null;
 
         return switch (status) {
             case 0 -> "PAID";
@@ -236,13 +195,8 @@ public class FactInvoiceItemWriter implements ItemWriter<FactInvoice> {
     }
 
     private Integer getStatusKey(String statusCode) {
-        if (statusCode == null) {
-            return null;
-        }
-
-        if (statusKeyCache.containsKey(statusCode)) {
-            return statusKeyCache.get(statusCode);
-        }
+        if (statusCode == null) return null;
+        if (statusKeyCache.containsKey(statusCode)) return statusKeyCache.get(statusCode);
 
         Integer statusKey = jdbcTemplate.query("""
             SELECT status_key
@@ -251,10 +205,7 @@ public class FactInvoiceItemWriter implements ItemWriter<FactInvoice> {
             LIMIT 1
         """, rs -> rs.next() ? rs.getInt("status_key") : null, statusCode);
 
-        if (statusKey != null) {
-            statusKeyCache.put(statusCode, statusKey);
-        }
-
+        if (statusKey != null) statusKeyCache.put(statusCode, statusKey);
         return statusKey;
     }
 }

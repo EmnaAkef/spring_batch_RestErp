@@ -1,6 +1,6 @@
 package com.spring_batch.RestErp.rh.batch.writer.config;
 
-import com.spring_batch.RestErp.rh.batch.writer.item.FactJobApplicationItemWriter;
+import com.spring_batch.RestErp.rh.batch.writer.itemWriter.FactJobApplicationItemWriter;
 import com.spring_batch.RestErp.rh.dto.fact.FactJobApplication;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Qualifier;

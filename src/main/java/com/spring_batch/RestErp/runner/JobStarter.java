@@ -256,28 +256,28 @@ public class JobStarter implements CommandLineRunner {
         jobLauncher.run(
                 loadFactJobApplicationJob,
                 new JobParametersBuilder()
-                        .addLong("time", baseTime + 60)
+                        .addLong("time", baseTime + 21)
                         .toJobParameters()
         );
 
 //        jobLauncher.run(
 //                loadFactAbsenceMonthlyJob,
 //                new JobParametersBuilder()
-//                        .addLong("time", baseTime + 20)
+//                        .addLong("time", baseTime + 22)
 //                        .toJobParameters()
 //        );
 
 //        jobLauncher.run(
 //                loadFactJobOfferJob,
 //                new JobParametersBuilder()
-//                        .addLong("time", baseTime + 70)
+//                        .addLong("time", baseTime + 23)
 //                        .toJobParameters()
 //        );
 
 //        jobLauncher.run(
 //                loadFactEmployeeHrJob,
 //                new JobParametersBuilder()
-//                        .addLong("time", baseTime + 20)
+//                        .addLong("time", baseTime + 24)
 //                        .addLong("run.id", baseTime + 120)
 //                        .toJobParameters()
 //        );
@@ -285,7 +285,7 @@ public class JobStarter implements CommandLineRunner {
 //        jobLauncher.run(
 //                loadFactAttendanceShiftJob,
 //                new JobParametersBuilder()
-//                        .addLong("time", baseTime + 30)
+//                        .addLong("time", baseTime + 25)
 //                        .addLong("run.id", baseTime + 130)
 //                        .toJobParameters()
 //        );
