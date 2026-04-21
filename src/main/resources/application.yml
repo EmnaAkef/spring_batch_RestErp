@@ -5,6 +5,14 @@ spring:
     job:
       enabled: false
 
+etl:
+  startup:
+    enabled: false
+  scheduler:
+    enabled: true
+    cron: "0 0 2 1 * *"
+    zone: Africa/Tunis
+
 
 app:
   datasource:
