@@ -9,6 +9,8 @@ public class FactJobOffer {
     private Integer postingDateKey;
     private Integer jobOfferKey;
     private Integer createdByUserKey;
+    private Integer companyKey;
+    private Integer departmentKey;
 
     private String status;
     private Integer jobOffersCount;
@@ -18,10 +20,8 @@ public class FactJobOffer {
     private Long companyId;
     private Long jobOfferId;
     private Long submittedUserId;
-    private LocalDateTime postingDate;
 
-    public FactJobOffer() {
-    }
+    private LocalDateTime postingDate;
 
     public Long getJobOfferFactKey() {
         return jobOfferFactKey;
@@ -53,6 +53,22 @@ public class FactJobOffer {
 
     public void setCreatedByUserKey(Integer createdByUserKey) {
         this.createdByUserKey = createdByUserKey;
+    }
+
+    public Integer getCompanyKey() {
+        return companyKey;
+    }
+
+    public void setCompanyKey(Integer companyKey) {
+        this.companyKey = companyKey;
+    }
+
+    public Integer getDepartmentKey() {
+        return departmentKey;
+    }
+
+    public void setDepartmentKey(Integer departmentKey) {
+        this.departmentKey = departmentKey;
     }
 
     public String getStatus() {
@@ -102,6 +118,8 @@ public class FactJobOffer {
     public void setSubmittedUserId(Long submittedUserId) {
         this.submittedUserId = submittedUserId;
     }
+
+
 
     public LocalDateTime getPostingDate() {
         return postingDate;

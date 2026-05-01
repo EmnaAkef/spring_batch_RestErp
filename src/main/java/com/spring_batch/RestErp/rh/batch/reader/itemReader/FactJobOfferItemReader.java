@@ -23,7 +23,6 @@ public class FactJobOfferItemReader implements ItemReader<FactJobOfferSource> {
 
     @Override
     public FactJobOfferSource read() {
-
         if (!loaded) {
             loadData();
             loaded = true;
@@ -56,14 +55,16 @@ public class FactJobOfferItemReader implements ItemReader<FactJobOfferSource> {
             }
 
             String sql = """
-                SELECT
-                    j.id,
-                    j.user_submited_id,
-                    j.status,
-                    j.posting_date
-                FROM %s.job_offer_model j
-                ORDER BY j.id
-            """.formatted(schemaName);
+    SELECT
+        j.id,
+        j.user_submited_id,
+        j.status,
+        j.posting_date
+    FROM %s.job_offer_model j
+    WHERE j.user_submited_id IS NOT NULL
+      AND j.posting_date IS NOT NULL
+    ORDER BY j.id
+""".formatted(schemaName);
 
             List<FactJobOfferSource> result = jdbcTemplate.query(sql, (rs, rowNum) -> {
 
@@ -74,16 +75,17 @@ public class FactJobOfferItemReader implements ItemReader<FactJobOfferSource> {
                 item.setSchemaName(schemaName);
 
                 item.setSubmittedUserId((Long) rs.getObject("user_submited_id"));
+                //item.setDepartmentId((Long) rs.getObject("department_id"));
                 item.setStatus(rs.getString("status"));
 
                 Timestamp ts = rs.getTimestamp("posting_date");
-                if (ts != null) {
-                    item.setPostingDate(ts.toLocalDateTime());
-                }
+                item.setPostingDate(ts.toLocalDateTime());
 
                 return item;
             });
+            System.out.println("Company: " + schemaName);
 
+            System.out.println("Rows fetched: " + result.size());
             jobOffers.addAll(result);
         }
     }

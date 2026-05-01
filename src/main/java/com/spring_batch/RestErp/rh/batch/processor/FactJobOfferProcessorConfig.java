@@ -12,38 +12,37 @@ public class FactJobOfferProcessorConfig {
     @Bean
     public ItemProcessor<FactJobOfferSource, FactJobOffer> factJobOfferProcessor() {
         return source -> {
-            if (source == null || source.getPostingDate() == null || source.getJobOfferId() == null) {
+            if (source == null) {
                 return null;
             }
 
             FactJobOffer fact = new FactJobOffer();
 
-            fact.setStatus(cleanText(source.getStatus()));
-            fact.setJobOffersCount(1);
-            fact.setIsActiveFlag(isActiveStatus(source.getStatus()) ? 1 : 0);
-
-            // champs techniques ETL
             fact.setCompanyId(source.getCompanyId());
             fact.setJobOfferId(source.getJobOfferId());
             fact.setSubmittedUserId(source.getSubmittedUserId());
             fact.setPostingDate(source.getPostingDate());
+
+            fact.setStatus(toUpper(cleanText(source.getStatus())));
+            fact.setJobOffersCount(1);
+            fact.setIsActiveFlag(isActiveStatus(source.getStatus()) ? 1 : 0);
 
             return fact;
         };
     }
 
     private String cleanText(String value) {
-        if (value == null) {
-            return null;
-        }
+        if (value == null) return null;
         String cleaned = value.trim();
         return cleaned.isEmpty() ? null : cleaned;
     }
 
+    private String toUpper(String value) {
+        return value == null ? null : value.toUpperCase();
+    }
+
     private boolean isActiveStatus(String status) {
-        if (status == null) {
-            return false;
-        }
+        if (status == null) return false;
 
         String s = status.trim().toUpperCase();
 

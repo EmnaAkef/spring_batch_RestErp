@@ -7,6 +7,13 @@ public class DimJobOffer {
 
     private Integer jobOfferKey;
     private Long jobOfferId;
+
+    private Long companyId;
+    private Integer companyKey;
+
+    private Integer submittedUserKey;
+    private Long submittedUserId;
+
     private String jobTitle;
     private String employmentType;
     private String location;
@@ -16,36 +23,10 @@ public class DimJobOffer {
     private BigDecimal salaryRangeMin;
     private BigDecimal salaryRangeMax;
     private String status;
-    private Long submittedUserId;
 
     private Timestamp effectiveFrom;
     private Timestamp effectiveTo;
     private Boolean isCurrent;
-
-    public DimJobOffer() {
-    }
-
-    public DimJobOffer(Integer jobOfferKey, Long jobOfferId, String jobTitle, String employmentType,
-                       String location, Timestamp postingDate, Timestamp expiryDate,
-                       Integer requiredExperienceYears, BigDecimal salaryRangeMin,
-                       BigDecimal salaryRangeMax, String status, Long submittedUserId,
-                       Timestamp effectiveFrom, Timestamp effectiveTo, Boolean isCurrent) {
-        this.jobOfferKey = jobOfferKey;
-        this.jobOfferId = jobOfferId;
-        this.jobTitle = jobTitle;
-        this.employmentType = employmentType;
-        this.location = location;
-        this.postingDate = postingDate;
-        this.expiryDate = expiryDate;
-        this.requiredExperienceYears = requiredExperienceYears;
-        this.salaryRangeMin = salaryRangeMin;
-        this.salaryRangeMax = salaryRangeMax;
-        this.status = status;
-        this.submittedUserId = submittedUserId;
-        this.effectiveFrom = effectiveFrom;
-        this.effectiveTo = effectiveTo;
-        this.isCurrent = isCurrent;
-    }
 
     public Integer getJobOfferKey() {
         return jobOfferKey;
@@ -61,6 +42,38 @@ public class DimJobOffer {
 
     public void setJobOfferId(Long jobOfferId) {
         this.jobOfferId = jobOfferId;
+    }
+
+    public Long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
+    }
+
+    public Integer getCompanyKey() {
+        return companyKey;
+    }
+
+    public void setCompanyKey(Integer companyKey) {
+        this.companyKey = companyKey;
+    }
+
+    public Integer getSubmittedUserKey() {
+        return submittedUserKey;
+    }
+
+    public void setSubmittedUserKey(Integer submittedUserKey) {
+        this.submittedUserKey = submittedUserKey;
+    }
+
+    public Long getSubmittedUserId() {
+        return submittedUserId;
+    }
+
+    public void setSubmittedUserId(Long submittedUserId) {
+        this.submittedUserId = submittedUserId;
     }
 
     public String getJobTitle() {
@@ -133,14 +146,6 @@ public class DimJobOffer {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public Long getSubmittedUserId() {
-        return submittedUserId;
-    }
-
-    public void setSubmittedUserId(Long submittedUserId) {
-        this.submittedUserId = submittedUserId;
     }
 
     public Timestamp getEffectiveFrom() {

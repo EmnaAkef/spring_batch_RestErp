@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 @Service
 public class EtlJobOrchestrator {
 
@@ -50,14 +49,14 @@ public class EtlJobOrchestrator {
 
         this.jobLauncher = jobLauncher;
         this.orderedJobs = List.of(
-                loadDimCompanyJob,
+               loadDimCompanyJob,
                 loadDimDepartmentJob,
                 loadDimUserJob,
                 loadDimCustomerJob,
                 loadDimWorkstatusJob,
                 loadDimProductJob,
                 loadDimVendorJob,
-                loadDimJobOfferJob,
+               loadDimJobOfferJob,
                 loadDimChartAccountJob,
                 loadDimWeeklyShiftTemplateJob,
                 loadDimDailyShiftTemplateJob,
@@ -93,4 +92,24 @@ public class EtlJobOrchestrator {
             log.info("Job {} finished with status={}", job.getName(), execution.getStatus());
         }
     }
+    public void runSingleJob(String jobName, String trigger) throws Exception {
+        long time = System.currentTimeMillis();
+
+        Job selectedJob = orderedJobs.stream()
+                .filter(job -> job.getName().equals(jobName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Job introuvable : " + jobName));
+
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("time", time)
+                .addString("trigger", trigger)
+                .toJobParameters();
+
+        log.info("Starting single job {} with trigger={}", selectedJob.getName(), trigger);
+
+        JobExecution execution = jobLauncher.run(selectedJob, jobParameters);
+
+        log.info("Job {} finished with status={}", selectedJob.getName(), execution.getStatus());
+    }
+
 }

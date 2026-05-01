@@ -15,8 +15,9 @@ public class FactJobApplicationItemWriter implements ItemWriter<FactJobApplicati
     private final JdbcTemplate jdbcTemplate;
 
     private final Map<LocalDate, Integer> dateKeyCache = new HashMap<>();
-    private final Map<Long, Integer> jobOfferKeyCache = new HashMap<>();
-    private final Map<Long, Integer> userKeyCache = new HashMap<>();
+    private final Map<String, Integer> jobOfferKeyCache = new HashMap<>();
+    private final Map<String, Integer> submittedUserKeyCache = new HashMap<>();
+    private final Map<Long, Integer> companyKeyCache = new HashMap<>();
 
     public FactJobApplicationItemWriter(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -29,60 +30,61 @@ public class FactJobApplicationItemWriter implements ItemWriter<FactJobApplicati
             Integer submissionDateKey = getDateKey(
                     item.getSubmissionDate() != null ? item.getSubmissionDate().toLocalDate() : null
             );
-            if (submissionDateKey == null) {
-                throw new IllegalStateException(
-                        "submission_date_key introuvable pour submissionDate = " + item.getSubmissionDate()
-                );
-            }
 
-            Integer jobOfferKey = getJobOfferKey(item.getJobOfferId());
-            Integer candidateUserKey = getUserKey(item.getCandidateUserId());
+            Integer jobOfferKey = getJobOfferKey(item.getCompanyId(), item.getJobOfferId());
+            Integer submittedUserKey = getSubmittedUserKeyFromJobOffer(item.getCompanyId(), item.getJobOfferId());
+            Integer companyKey = getCompanyKey(item.getCompanyId());
+
+            if (submissionDateKey == null || jobOfferKey == null || submittedUserKey == null || companyKey == null) {
+                System.out.println("SKIP fact_job_application | jobOfferId=" + item.getJobOfferId()
+                        + " | companyId=" + item.getCompanyId()
+                        + " | dateKey=" + submissionDateKey
+                        + " | jobOfferKey=" + jobOfferKey
+                        + " | submittedUserKey=" + submittedUserKey
+                        + " | companyKey=" + companyKey);
+                continue;
+            }
 
             item.setSubmissionDateKey(submissionDateKey);
             item.setJobOfferKey(jobOfferKey);
-            item.setCandidateUserKey(candidateUserKey);
-
-            // Ignore les lignes si une cle obligatoire manque.
-            if (item.getSubmissionDateKey() == null || item.getJobOfferKey() == null) {
-                continue;
-            }
+            item.setSubmittedUserKey(submittedUserKey);
+            item.setCompanyKey(companyKey);
 
             jdbcTemplate.update("""
                 INSERT INTO public.fact_job_application (
                     submission_date_key,
                     job_offer_key,
-                    candidate_user_key,
+                    submitted_user_key,
+                    company_key,
                     application_status,
                     applications_count,
                     is_hired_flag
                 )
-                SELECT ?, ?, ?, ?, ?, ?
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM public.fact_job_application
-                    WHERE submission_date_key = ?
-                      AND job_offer_key = ?
-                      AND COALESCE(candidate_user_key, -1) = COALESCE(?, -1)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (
+                    submission_date_key,
+                    job_offer_key,
+                    submitted_user_key,
+                    company_key
                 )
+                DO UPDATE SET
+                    application_status = EXCLUDED.application_status,
+                    applications_count = EXCLUDED.applications_count,
+                    is_hired_flag = EXCLUDED.is_hired_flag
             """,
                     item.getSubmissionDateKey(),
                     item.getJobOfferKey(),
-                    item.getCandidateUserKey(),
+                    item.getSubmittedUserKey(),
+                    item.getCompanyKey(),
                     item.getApplicationStatus(),
                     item.getApplicationsCount(),
-                    item.getIsHiredFlag(),
-
-                    item.getSubmissionDateKey(),
-                    item.getJobOfferKey(),
-                    item.getCandidateUserKey()
+                    item.getIsHiredFlag()
             );
         }
     }
 
     private Integer getDateKey(LocalDate date) {
-        if (date == null) {
-            return null;
-        }
+        if (date == null) return null;
 
         if (dateKeyCache.containsKey(date)) {
             return dateKeyCache.get(date);
@@ -102,53 +104,78 @@ public class FactJobApplicationItemWriter implements ItemWriter<FactJobApplicati
         return dateKey;
     }
 
-    private Integer getJobOfferKey(Long jobOfferId) {
-        if (jobOfferId == null) {
-            return null;
-        }
+    private Integer getJobOfferKey(Long companyId, Long jobOfferId) {
+        if (companyId == null || jobOfferId == null) return null;
 
-        if (jobOfferKeyCache.containsKey(jobOfferId)) {
-            return jobOfferKeyCache.get(jobOfferId);
+        String cacheKey = companyId + "|" + jobOfferId;
+
+        if (jobOfferKeyCache.containsKey(cacheKey)) {
+            return jobOfferKeyCache.get(cacheKey);
         }
 
         Integer jobOfferKey = jdbcTemplate.query("""
             SELECT job_offer_key
             FROM public.dim_job_offer
-            WHERE job_offer_id = ?
+            WHERE company_id = ?
+              AND job_offer_id = ?
               AND is_current = TRUE
             ORDER BY job_offer_key DESC
             LIMIT 1
-        """, rs -> rs.next() ? rs.getInt("job_offer_key") : null, jobOfferId);
+        """, rs -> rs.next() ? rs.getInt("job_offer_key") : null, companyId, jobOfferId);
 
         if (jobOfferKey != null) {
-            jobOfferKeyCache.put(jobOfferId, jobOfferKey);
+            jobOfferKeyCache.put(cacheKey, jobOfferKey);
         }
 
         return jobOfferKey;
     }
 
-    private Integer getUserKey(Long userId) {
-        if (userId == null) {
-            return null;
+    private Integer getSubmittedUserKeyFromJobOffer(Long companyId, Long jobOfferId) {
+        if (companyId == null || jobOfferId == null) return null;
+
+        String cacheKey = companyId + "|" + jobOfferId;
+
+        if (submittedUserKeyCache.containsKey(cacheKey)) {
+            return submittedUserKeyCache.get(cacheKey);
         }
 
-        if (userKeyCache.containsKey(userId)) {
-            return userKeyCache.get(userId);
-        }
-
-        Integer userKey = jdbcTemplate.query("""
-            SELECT user_key
-            FROM public.dim_user
-            WHERE user_id = ?
+        Integer submittedUserKey = jdbcTemplate.query("""
+            SELECT submitted_user_key
+            FROM public.dim_job_offer
+            WHERE company_id = ?
+              AND job_offer_id = ?
               AND is_current = TRUE
-            ORDER BY user_key DESC
+            ORDER BY job_offer_key DESC
             LIMIT 1
-        """, rs -> rs.next() ? rs.getInt("user_key") : null, userId);
+        """, rs -> rs.next() ? (Integer) rs.getObject("submitted_user_key") : null, companyId, jobOfferId);
 
-        if (userKey != null) {
-            userKeyCache.put(userId, userKey);
+        if (submittedUserKey != null) {
+            submittedUserKeyCache.put(cacheKey, submittedUserKey);
         }
 
-        return userKey;
+        return submittedUserKey;
+    }
+
+    private Integer getCompanyKey(Long companyId) {
+        if (companyId == null) return null;
+
+        if (companyKeyCache.containsKey(companyId)) {
+            return companyKeyCache.get(companyId);
+        }
+
+        Integer companyKey = jdbcTemplate.query("""
+            SELECT company_key
+            FROM public.dim_company
+            WHERE company_id = ?
+              AND is_current = TRUE
+            ORDER BY company_key DESC
+            LIMIT 1
+        """, rs -> rs.next() ? rs.getInt("company_key") : null, companyId);
+
+        if (companyKey != null) {
+            companyKeyCache.put(companyId, companyKey);
+        }
+
+        return companyKey;
     }
 }

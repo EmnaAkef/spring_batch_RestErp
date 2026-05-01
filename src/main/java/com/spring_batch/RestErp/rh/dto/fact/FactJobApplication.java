@@ -8,21 +8,25 @@ public class FactJobApplication {
 
     private Integer submissionDateKey;
     private Integer jobOfferKey;
-    private Integer candidateUserKey;
+    private Integer companyKey;
 
     private String applicationStatus;
     private Integer applicationsCount;
     private Integer isHiredFlag;
 
-    // champs techniques ETL
+    // Champs techniques ETL
     private Long companyId;
     private Long jobOfferId;
-    private Long candidateUserId;
     private LocalDateTime submissionDate;
+    private Integer submittedUserKey;
 
-    public FactJobApplication() {
+    public Integer getSubmittedUserKey() {
+        return submittedUserKey;
     }
 
+    public void setSubmittedUserKey(Integer submittedUserKey) {
+        this.submittedUserKey = submittedUserKey;
+    }
     public Long getJobAppFactKey() {
         return jobAppFactKey;
     }
@@ -47,12 +51,12 @@ public class FactJobApplication {
         this.jobOfferKey = jobOfferKey;
     }
 
-    public Integer getCandidateUserKey() {
-        return candidateUserKey;
+    public Integer getCompanyKey() {
+        return companyKey;
     }
 
-    public void setCandidateUserKey(Integer candidateUserKey) {
-        this.candidateUserKey = candidateUserKey;
+    public void setCompanyKey(Integer companyKey) {
+        this.companyKey = companyKey;
     }
 
     public String getApplicationStatus() {
@@ -93,14 +97,6 @@ public class FactJobApplication {
 
     public void setJobOfferId(Long jobOfferId) {
         this.jobOfferId = jobOfferId;
-    }
-
-    public Long getCandidateUserId() {
-        return candidateUserId;
-    }
-
-    public void setCandidateUserId(Long candidateUserId) {
-        this.candidateUserId = candidateUserId;
     }
 
     public LocalDateTime getSubmissionDate() {

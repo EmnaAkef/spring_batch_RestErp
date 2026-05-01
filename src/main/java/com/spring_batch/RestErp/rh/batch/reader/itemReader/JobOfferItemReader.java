@@ -1,7 +1,5 @@
 package com.spring_batch.RestErp.rh.batch.reader.itemReader;
 
-
-
 import com.spring_batch.RestErp.rh.dto.source.JobOfferSource;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -68,15 +66,24 @@ public class JobOfferItemReader implements ItemReader<JobOfferSource> {
                     j.salary_range_max,
                     j.status,
                     j.user_submited_id,
+                    u.department_id,
                     j."timestamp"
                 FROM %s.job_offer_model j
+                LEFT JOIN %s.users_table u
+                    ON u.user_id = j.user_submited_id
+                WHERE j.user_submited_id IS NOT NULL
+                  AND u.department_id IS NOT NULL
+                  AND j.posting_date IS NOT NULL
                 ORDER BY j.id
-            """.formatted(schemaName);
+            """.formatted(schemaName, schemaName);
 
             List<JobOfferSource> result = jdbcTemplate.query(sql, (rs, rowNum) -> {
                 JobOfferSource jobOffer = new JobOfferSource();
 
                 jobOffer.setId(rs.getLong("id"));
+                jobOffer.setCompanyId(companyId);
+                jobOffer.setSchemaName(schemaName);
+
                 jobOffer.setEmploymentType(rs.getString("employment_type"));
                 jobOffer.setExpiryDate(rs.getTimestamp("expiry_date"));
                 jobOffer.setJobTitle(rs.getString("jobtitle"));
@@ -87,6 +94,7 @@ public class JobOfferItemReader implements ItemReader<JobOfferSource> {
                 jobOffer.setSalaryRangeMax(rs.getBigDecimal("salary_range_max"));
                 jobOffer.setStatus(rs.getString("status"));
                 jobOffer.setSubmittedUserId((Long) rs.getObject("user_submited_id"));
+                jobOffer.setDepartmentId((Long) rs.getObject("department_id"));
                 jobOffer.setSourceTimestamp(rs.getTimestamp("timestamp"));
 
                 return jobOffer;

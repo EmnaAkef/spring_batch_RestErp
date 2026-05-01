@@ -25,6 +25,7 @@ public class AbsenceMonthlyItemWriter implements ItemWriter<FactAbsenceMonthly> 
     public void write(Chunk<? extends FactAbsenceMonthly> chunk) {
         for (FactAbsenceMonthly item : chunk) {
 
+
             Integer monthDateKey = getDateKey(item.getMonthDate());
             item.setMonthDateKey(monthDateKey);
 
@@ -67,24 +68,24 @@ public class AbsenceMonthlyItemWriter implements ItemWriter<FactAbsenceMonthly> 
         }
     }
 
-    private Integer getDateKey(LocalDate monthDate) {
-        if (monthDate == null) {
+    private Integer getDateKey(LocalDate postingDate) {
+        if (postingDate == null) {
             return null;
         }
 
-        if (dateKeyCache.containsKey(monthDate)) {
-            return dateKeyCache.get(monthDate);
+        if (dateKeyCache.containsKey(postingDate)) {
+            return dateKeyCache.get(postingDate);
         }
 
         Integer dateKey = jdbcTemplate.query("""
-            SELECT date_key
-            FROM dim_date
-            WHERE full_date = ?
-            LIMIT 1
-        """, rs -> rs.next() ? rs.getInt("date_key") : null, monthDate);
+        SELECT date_key
+        FROM dim_date
+        WHERE full_date = ?
+        LIMIT 1
+    """, rs -> rs.next() ? rs.getInt("date_key") : null, postingDate);
 
         if (dateKey != null) {
-            dateKeyCache.put(monthDate, dateKey);
+            dateKeyCache.put(postingDate, dateKey);
         }
 
         return dateKey;

@@ -6,6 +6,9 @@ import java.sql.Timestamp;
 public class JobOfferSource {
 
     private Long id;
+    private Long companyId;
+    private String schemaName;
+
     private String employmentType;
     private Timestamp expiryDate;
     private String jobTitle;
@@ -17,26 +20,13 @@ public class JobOfferSource {
     private String status;
     private Long submittedUserId;
     private Timestamp sourceTimestamp;
-
-    public JobOfferSource() {
+    private Long departmentId;
+    public Long getDepartmentId() {
+        return departmentId;
     }
 
-    public JobOfferSource(Long id, String employmentType, Timestamp expiryDate, String jobTitle,
-                          String location, Timestamp postingDate, Integer requiredExperienceYears,
-                          BigDecimal salaryRangeMin, BigDecimal salaryRangeMax,
-                          String status, Long submittedUserId, Timestamp sourceTimestamp) {
-        this.id = id;
-        this.employmentType = employmentType;
-        this.expiryDate = expiryDate;
-        this.jobTitle = jobTitle;
-        this.location = location;
-        this.postingDate = postingDate;
-        this.requiredExperienceYears = requiredExperienceYears;
-        this.salaryRangeMin = salaryRangeMin;
-        this.salaryRangeMax = salaryRangeMax;
-        this.status = status;
-        this.submittedUserId = submittedUserId;
-        this.sourceTimestamp = sourceTimestamp;
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
     }
 
     public Long getId() {
@@ -45,6 +35,22 @@ public class JobOfferSource {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
+    }
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
     }
 
     public String getEmploymentType() {

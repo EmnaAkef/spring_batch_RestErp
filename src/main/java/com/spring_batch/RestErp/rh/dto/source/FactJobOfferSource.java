@@ -12,9 +12,6 @@ public class FactJobOfferSource {
     private String status;
     private LocalDateTime postingDate;
 
-    public FactJobOfferSource() {
-    }
-
     public Long getJobOfferId() {
         return jobOfferId;
     }
@@ -46,6 +43,8 @@ public class FactJobOfferSource {
     public void setSubmittedUserId(Long submittedUserId) {
         this.submittedUserId = submittedUserId;
     }
+
+
 
     public String getStatus() {
         return status;

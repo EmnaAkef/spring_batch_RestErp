@@ -58,15 +58,14 @@ public class FactJobApplicationItemReader implements ItemReader<FactJobApplicati
                 SELECT
                     js.id,
                     js.job_offer_id,
-                    jo.user_submited_id,
                     js.status,
                     js.submission_date,
                     js.timestamp
                 FROM %s.jobsubmissionmodel js
-                LEFT JOIN %s.job_offer_model jo
-                       ON jo.id = js.job_offer_id
+                WHERE js.job_offer_id IS NOT NULL
+                  AND js.submission_date IS NOT NULL
                 ORDER BY js.id
-            """.formatted(schemaName, schemaName);
+            """.formatted(schemaName);
 
             List<FactJobApplicationSource> result = jdbcTemplate.query(sql, (rs, rowNum) -> {
 
@@ -77,7 +76,6 @@ public class FactJobApplicationItemReader implements ItemReader<FactJobApplicati
                 item.setSchemaName(schemaName);
 
                 item.setJobOfferId((Long) rs.getObject("job_offer_id"));
-                item.setCandidateUserId((Long) rs.getObject("user_submited_id"));
                 item.setApplicationStatus(rs.getString("status"));
 
                 Timestamp submissionTs = rs.getTimestamp("submission_date");
@@ -93,7 +91,8 @@ public class FactJobApplicationItemReader implements ItemReader<FactJobApplicati
                 item.setIsHired(isHiredStatus(rs.getString("status")));
 
                 return item;
-            });
+            });System.out.println("Company: " + schemaName);
+            System.out.println("Rows fetched: " + result.size());
 
             applications.addAll(result);
         }

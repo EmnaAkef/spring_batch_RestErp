@@ -8,11 +8,14 @@ spring:
 etl:
   startup:
     enabled: false
-  scheduler:
+
+  single:
     enabled: true
+
+  scheduler:
+    enabled: false
     cron: "0 0 2 1 * *"
     zone: Africa/Tunis
-
 
 app:
   datasource:
@@ -25,6 +28,6 @@ app:
     dw:
       url: jdbc:postgresql://localhost:5432/rest_erp_dw
       username: postgres
-#      password: Messaoud123!
-      password: Akef123*
+      password: Messaoud123!
+      # password: Akef123*
       driver-class-name: org.postgresql.Driver

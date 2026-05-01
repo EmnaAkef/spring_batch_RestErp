@@ -18,6 +18,9 @@ public class JobOfferItemProcessor implements ItemProcessor<JobOfferSource, DimJ
         DimJobOffer dim = new DimJobOffer();
 
         dim.setJobOfferId(source.getId());
+
+        dim.setCompanyId(source.getCompanyId());
+
         dim.setJobTitle(capitalizeFirst(cleanText(source.getJobTitle())));
         dim.setEmploymentType(toUpper(cleanText(source.getEmploymentType())));
         dim.setLocation(capitalizeFirst(cleanText(source.getLocation())));
@@ -27,6 +30,8 @@ public class JobOfferItemProcessor implements ItemProcessor<JobOfferSource, DimJ
         dim.setSalaryRangeMin(source.getSalaryRangeMin());
         dim.setSalaryRangeMax(source.getSalaryRangeMax());
         dim.setStatus(toUpper(cleanText(source.getStatus())));
+
+        // user_id source, il sera transformé en submitted_user_key dans le writer
         dim.setSubmittedUserId(source.getSubmittedUserId());
 
         dim.setEffectiveFrom(Timestamp.from(Instant.now()));
