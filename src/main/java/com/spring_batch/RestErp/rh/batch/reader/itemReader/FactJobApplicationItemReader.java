@@ -103,6 +103,10 @@ public class FactJobApplicationItemReader implements ItemReader<FactJobApplicati
             return false;
         }
 
-        return status.trim().equalsIgnoreCase("ACTIVE");
+        String s = status.trim().toUpperCase();
+
+        return s.equals("HIRED")
+                || s.equals("ACCEPTED")
+                || s.equals("ACTIVE");
     }
 }

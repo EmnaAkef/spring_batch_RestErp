@@ -16,6 +16,6 @@ public class SingleJobRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        orchestrator.runSingleJob("loadFactJobApplicationJob", "manual-test");
+        orchestrator.runSingleJob("loadFactJobOfferJob", "manual-test");
     }
 }

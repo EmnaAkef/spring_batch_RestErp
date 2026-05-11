@@ -52,25 +52,25 @@ public class FactJobApplicationItemWriter implements ItemWriter<FactJobApplicati
 
             jdbcTemplate.update("""
                 INSERT INTO public.fact_job_application (
-                    submission_date_key,
-                    job_offer_key,
-                    submitted_user_key,
-                    company_key,
-                    application_status,
-                    applications_count,
-                    is_hired_flag
-                )
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT (
-                    submission_date_key,
-                    job_offer_key,
-                    submitted_user_key,
-                    company_key
-                )
-                DO UPDATE SET
-                    application_status = EXCLUDED.application_status,
-                    applications_count = EXCLUDED.applications_count,
-                    is_hired_flag = EXCLUDED.is_hired_flag
+                  submission_date_key,
+                  job_offer_key,
+                  submitted_user_key,
+                  company_key,
+                  application_status,
+                  applications_count,
+                  is_hired_flag
+              )
+              VALUES (?, ?, ?, ?, ?, ?, ?)
+              ON CONFLICT (
+                  submission_date_key,
+                  job_offer_key,
+                  company_key,
+                  application_status
+              )
+              DO UPDATE SET
+                  applications_count = fact_job_application.applications_count + EXCLUDED.applications_count,
+                  is_hired_flag = fact_job_application.is_hired_flag + EXCLUDED.is_hired_flag,
+                  submitted_user_key = EXCLUDED.submitted_user_key;
             """,
                     item.getSubmissionDateKey(),
                     item.getJobOfferKey(),
