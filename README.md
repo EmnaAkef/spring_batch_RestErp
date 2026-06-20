@@ -1,151 +1,80 @@
 # REST ERP BI - ETL & Data Warehouse
 
-## Description
+> Module ETL développé pour synchroniser les données opérationnelles de REST ERP vers un Data Warehouse décisionnel, afin de préparer les données nécessaires aux analyses BI, aux KPIs et aux dashboards.
 
-Ce dépôt contient la partie ETL du module Business Intelligence intégré à REST ERP.
+![Statut](https://img.shields.io/badge/statut-termin%C3%A9-brightgreen)
+![Java](https://img.shields.io/badge/Java-17-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green)
+![Spring Batch](https://img.shields.io/badge/Spring%20Batch-ETL-brightgreen)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Data%20Warehouse-blue)
 
-L’objectif principal de ce projet est d’extraire les données depuis la base opérationnelle REST ERP, de les transformer, puis de les charger dans un Data Warehouse dédié à l’analyse décisionnelle.
+---
 
-Cette partie permet d’alimenter les tables de dimensions et les tables de faits utilisées par les dashboards BI.
+## 🎯 Contexte
 
-## Objectifs du module ETL
+* **Type de projet** : Académique - Projet de Fin d’Études
+* **Durée** : 14 semaines
+* **Projet global** : Intégration d’une couche Business Intelligence dans REST ERP
+* **Problématique** : Les données opérationnelles de REST ERP sont stockées dans la base de données, mais elles ne sont pas suffisamment exploitées pour l’analyse décisionnelle.
 
-* Extraire les données opérationnelles depuis les schémas des entreprises.
-* Transformer les données pour les adapter au modèle décisionnel.
-* Charger les données dans le Data Warehouse.
-* Gérer l’historisation des dimensions avec le principe SCD.
-* Alimenter les tables de faits utilisées pour les KPIs.
-* Automatiser le chargement grâce à un scheduler.
+Ce dépôt représente la partie ETL du projet.
+Il permet d’extraire les données depuis la base opérationnelle REST ERP, de les transformer, puis de les charger dans un Data Warehouse optimisé pour l’analyse.
 
-## Architecture générale
+---
 
-Le flux de données suit le parcours suivant :
+## ✨ Fonctionnalités principales
 
-Base opérationnelle REST ERP
-→ Processus ETL Spring Batch
-→ Data Warehouse PostgreSQL
-→ Backend BI
-→ Dashboards Angular
+* ✅ Extraction des données depuis la base opérationnelle REST ERP
+* ✅ Transformation des données selon le modèle décisionnel
+* ✅ Chargement des données dans le Data Warehouse PostgreSQL
+* ✅ Alimentation des tables de dimensions et des tables de faits
+* ✅ Gestion de l’historisation des dimensions avec le principe SCD
+* ✅ Synchronisation automatique des données à travers un scheduler
+* ✅ Support du principe multi-tenant avec séparation des données par entreprise
 
-## Technologies utilisées
+---
 
-* Java
-* Spring Boot
-* Spring Batch
-* PostgreSQL
-* Spring Data JPA
-* Scheduler
-* SQL
-* Maven
+## 🛠️ Stack technique
 
-## Structure du projet
+| Catégorie               | Technologies utilisées                     |
+| ----------------------- | ------------------------------------------ |
+| Langages                | Java, SQL                                  |
+| Frameworks / Librairies | Spring Boot, Spring Batch, Spring Data JPA |
+| Base de données         | PostgreSQL                                 |
+| Outils / Environnement  | Maven, Git, Scheduler, IntelliJ IDEA       |
 
-```text
-src/
- └── main/
-     ├── java/
-     │   └── ...
-     │       ├── config/
-     │       ├── job/
-     │       ├── reader/
-     │       ├── processor/
-     │       ├── writer/
-     │       ├── entity/
-     │       ├── repository/
-     │       └── service/
-     └── resources/
-         ├── application.properties
-         └── schema.sql
+---
+
+## 📸 Aperçu / Démo
+
+![Aperçu ETL](screenshots/etl-process.png)
+
+🔗 **Démo en ligne** : Non disponible
+🎥 **Vidéo de démonstration** : À ajouter si disponible
+
+---
+
+## ⚙️ Installation
+
+```bash
+# Cloner le repo
+git clone https://github.com/tonpseudo/rest-erp-bi-etl.git
+cd rest-erp-bi-etl
+
+# Installer les dépendances
+mvn clean install
+
+# Lancer le projet
+mvn spring-boot:run
 ```
 
-## Principe de fonctionnement
-
-Le processus ETL est basé sur trois étapes principales :
-
-### 1. Extraction
-
-Les données sont lues depuis la base opérationnelle REST ERP.
-
-Exemples de données extraites :
-
-* Employés
-* Départements
-* Présences
-* Clients
-* Factures
-* Commandes
-* Deals commerciaux
-
-### 2. Transformation
-
-Les données extraites sont nettoyées et adaptées au modèle décisionnel.
-
-Exemples de transformations :
-
-* Association des données avec `company_key`
-* Conversion des dates vers `date_key`
-* Calcul de certaines valeurs intermédiaires
-* Préparation des données pour les tables de faits
-* Gestion des valeurs nulles
-* Application du principe SCD pour certaines dimensions
-
-### 3. Chargement
-
-Les données transformées sont insérées ou mises à jour dans les tables du Data Warehouse.
-
-Exemples de tables alimentées :
-
-* `dim_company`
-* `dim_user`
-* `dim_department`
-* `dim_customer`
-* `dim_date`
-* `fact_employee_hr`
-* `fact_attendance_shift`
-* `fact_invoice`
-* `fact_bill`
-* `fact_deal`
-* `fact_sales_order`
-
-## Data Warehouse
-
-Le Data Warehouse est basé sur un modèle dimensionnel.
-
-Il contient :
-
-* Des tables de dimensions pour décrire les axes d’analyse.
-* Des tables de faits pour stocker les mesures métier.
-
-Ce modèle facilite le calcul des KPIs et améliore les performances des requêtes analytiques.
-
-## Gestion multi-tenant
-
-REST ERP est une solution multi-tenant.
-
-Chaque entreprise possède ses propres données opérationnelles.
-Lors du chargement, les données sont associées à une entreprise à travers la clé `company_key`.
-
-Cela permet de séparer les analyses par entreprise et de garantir que chaque utilisateur visualise uniquement les données de sa société.
-
-## Scheduler
-
-Un scheduler permet de lancer automatiquement les jobs ETL.
-
-Exemples de fréquence possible :
-
-* Chargement quotidien
-* Chargement hebdomadaire
-* Chargement manuel pendant les tests
-
-## Configuration
-
-La configuration principale se trouve dans le fichier :
+Avant le lancement, il faut configurer la connexion à la base de données dans le fichier :
 
 ```text
 src/main/resources/application.properties
 ```
 
-Exemple de configuration :
+Exemple :
 
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/rest_erp_bi
@@ -156,62 +85,103 @@ spring.jpa.hibernate.ddl-auto=none
 spring.jpa.show-sql=true
 ```
 
-## Lancement du projet
+---
 
-### 1. Cloner le projet
+## 🚀 Utilisation
 
-```bash
-git clone <url-du-repo-etl>
-cd <nom-du-repo-etl>
-```
+Une fois le projet lancé, les jobs ETL permettent de charger les données dans le Data Warehouse.
 
-### 2. Configurer la base de données
-
-Modifier les informations de connexion dans :
+Le processus suit trois étapes principales :
 
 ```text
-application.properties
+Base opérationnelle REST ERP
+        ↓
+Extraction des données
+        ↓
+Transformation et nettoyage
+        ↓
+Chargement dans le Data Warehouse
 ```
 
-### 3. Lancer l’application
+Exemples de traitements réalisés :
 
-```bash
-mvn spring-boot:run
-```
+* Chargement des entreprises dans `dim_company`
+* Chargement des employés dans `dim_user`
+* Chargement des départements dans `dim_department`
+* Chargement des clients dans `dim_customer`
+* Chargement des dates dans `dim_date`
+* Chargement des présences dans `fact_attendance_shift`
+* Chargement des factures dans `fact_invoice`
+* Chargement des deals commerciaux dans `fact_deal`
 
-## Exemple de job ETL
+---
 
-Un job ETL peut être lancé pour charger les données d’une entreprise donnée.
+## 📊 Résultats / Insights
 
-Exemple logique :
+* 🔑 **Insight clé 1** : Les données opérationnelles sont centralisées dans un Data Warehouse structuré pour l’analyse décisionnelle.
+* 📈 **Indicateur clé** : Les tables de faits permettent de calculer les KPIs RH, Finance et Sales.
+* 📋 **Dashboard interactif** : Les données alimentées par l’ETL sont ensuite consommées par le backend BI et affichées dans le frontend Angular.
+
+---
+
+## 🗂️ Architecture
 
 ```text
-Job RH
-→ Lire les employés
-→ Transformer les données RH
-→ Charger dim_user et fact_employee_hr
++-----------------------------+
+| Base opérationnelle REST ERP |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| Module ETL Spring Batch      |
+| - Reader                    |
+| - Processor                 |
+| - Writer                    |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| Data Warehouse PostgreSQL    |
+| - Tables de dimensions       |
+| - Tables de faits            |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| Backend BI APIs              |
++--------------+--------------+
+               |
+               v
++-----------------------------+
+| Dashboards Angular           |
++-----------------------------+
 ```
 
-```text
-Job Finance
-→ Lire les factures et les dépenses
-→ Transformer les montants
-→ Charger fact_invoice et fact_bill
-```
+---
 
-```text
-Job Sales
-→ Lire les deals et commandes
-→ Transformer les statuts
-→ Charger fact_deal et fact_sales_order
-```
+## 🔮 Améliorations futures
 
-## Résultat attendu
+* [ ] Ajouter un suivi détaillé des logs ETL dans une interface d’administration
+* [ ] Ajouter une relance automatique en cas d’échec d’un job
+* [ ] Optimiser davantage les performances de chargement
+* [ ] Ajouter des tests automatisés pour chaque job ETL
+* [ ] Mettre en place un monitoring complet des traitements
 
-Après l’exécution des jobs ETL, le Data Warehouse contient des données prêtes à être utilisées par le backend BI pour calculer les KPIs et alimenter les dashboards.
+---
 
-## Auteur
+## 👥 Auteurs
 
-Projet réalisé dans le cadre du Projet de Fin d’Études.
+Projet réalisé par :
 
-Module : Business Intelligence intégré à REST ERP.
+Emna Akef
+
+🔗 LinkedIn : www.linkedin.com/in/emna-akef
+💻 GitHub : https://github.com/EmnaAkef
+📧 Email : akef.emna@gmail.com
+
+Ghofrane Messaoud
+
+🔗 LinkedIn : www.linkedin.com/in/ghofrane-messaoud
+💻 GitHub : https://github.com/ghoffraanee
+📧 Email : ghofranemessaoud05@gmail.com
+
