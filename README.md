@@ -45,15 +45,6 @@ Il permet d’extraire les données depuis la base opérationnelle REST ERP, de 
 
 ---
 
-## 📸 Aperçu / Démo
-
-![Aperçu ETL](screenshots/etl-process.png)
-
-🔗 **Démo en ligne** : Non disponible
-🎥 **Vidéo de démonstration** : À ajouter si disponible
-
----
-
 ## ⚙️ Installation
 
 ```bash
